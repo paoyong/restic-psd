@@ -1,0 +1,7 @@
+restic init --repo E:\test_repo  
+restic backup "C:\Users\pao\Desktop\" -r E:\test_repo --exclude-file="C:\Users\pao\Dropbox\scripts\restic_exclude.txt" --password-file C:\Users\pao\Dropbox\scripts\restic_password
+
+
+RESTORE
+restic restore --target="C:\Users\pao\Desktop\restic_restore" latest -r E:\backups\restic_bihourly --password-file C:\Users\pao\Dropbox\backup_scripts\restic_password
+restic -r E:\test_repo forget --keep-last 8 --prune --password-file C:\Users\pao\Dropbox\scripts\restic_password
