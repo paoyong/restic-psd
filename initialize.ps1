@@ -11,7 +11,9 @@ Add-Type -AssemblyName System.Drawing
 $ScriptDir   = Split-Path -Parent $MyInvocation.MyCommand.Path
 $InstallPath = "C:\Program Files\ResticPSD"
 $TaskNames   = @("ResticBihourly", "ResticDaily")
+$MainFont    = "Segoe UI"
 
+																							
 function Get-TaskStatus($taskName) {
     $task = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
     if ($task) { return [char]0x2713 } else { return [char]0x2717 }
@@ -20,21 +22,21 @@ function Get-TaskStatus($taskName) {
 function Add-RepoPicker($labelText, $defaultPath, $top) {
     $lbl          = New-Object System.Windows.Forms.Label
     $lbl.Text     = $labelText
-    $lbl.Font     = New-Object System.Drawing.Font("Segoe UI", 9)
+    $lbl.Font     = New-Object System.Drawing.Font($MainFont, 9)
     $lbl.Location = New-Object System.Drawing.Point(20, $top)
     $lbl.Size     = New-Object System.Drawing.Size(520, 18)
     $form.Controls.Add($lbl)
 
     $txt          = New-Object System.Windows.Forms.TextBox
     $txt.Text     = $defaultPath
-    $txt.Font     = New-Object System.Drawing.Font("Segoe UI", 9)
+    $txt.Font     = New-Object System.Drawing.Font($MainFont, 9)
     $txt.Location = New-Object System.Drawing.Point(20, ($top + 20))
     $txt.Size     = New-Object System.Drawing.Size(408, 24)
     $form.Controls.Add($txt)
 
     $btn          = New-Object System.Windows.Forms.Button
     $btn.Text     = "Browse..."
-    $btn.Font     = New-Object System.Drawing.Font("Segoe UI", 9)
+    $btn.Font     = New-Object System.Drawing.Font($MainFont, 9)
     $btn.Location = New-Object System.Drawing.Point(436, ($top + 19))
     $btn.Size     = New-Object System.Drawing.Size(102, 26)
     $form.Controls.Add($btn)
@@ -48,74 +50,158 @@ function Add-RepoPicker($labelText, $defaultPath, $top) {
 
     return $txt
 }
-
 # --- Form ---
 $form = New-Object System.Windows.Forms.Form
 $form.Text            = "ResticPSD Setup"
-$form.Size            = New-Object System.Drawing.Size(560, 490)
+$form.AutoSize        = $true
+$form.AutoSizeMode    = "GrowAndShrink"
 $form.StartPosition   = "CenterScreen"
 $form.FormBorderStyle = "FixedDialog"
 $form.MaximizeBox     = $false
+$form.Font            = New-Object System.Drawing.Font($MainFont, 9)
 
-$lblTitle = New-Object System.Windows.Forms.Label
-$lblTitle.Text     = "ResticPSD Setup"
-$lblTitle.Font     = New-Object System.Drawing.Font("Segoe UI", 14, [System.Drawing.FontStyle]::Bold)
-$lblTitle.Location = New-Object System.Drawing.Point(20, 15)
-$lblTitle.Size     = New-Object System.Drawing.Size(520, 30)
-$form.Controls.Add($lblTitle)
+# --- Root container (vertical layout like HTML body) ---
+$root = New-Object System.Windows.Forms.FlowLayoutPanel
+$root.FlowDirection = "TopDown"
+$root.WrapContents  = $false
+$root.AutoSize      = $true
+$root.Dock          = "Fill"
+$root.Padding       = New-Object System.Windows.Forms.Padding(15)
+$form.Controls.Add($root)
 
 # --- Scheduled task status ---
 $lblSub = New-Object System.Windows.Forms.Label
-$lblSub.Text     = "Scheduled task status:"
-$lblSub.Font     = New-Object System.Drawing.Font("Segoe UI", 9)
-$lblSub.Location = New-Object System.Drawing.Point(20, 52)
-$lblSub.Size     = New-Object System.Drawing.Size(520, 18)
-$form.Controls.Add($lblSub)
+$lblSub.Text = "Scheduled task status:"
+$lblSub.AutoSize = $true
+$lblSub.Margin = "0,0,0,5"
+$root.Controls.Add($lblSub)
 
 $taskLabels = @{}
-$y = 72
 foreach ($name in $TaskNames) {
-    $lbl           = New-Object System.Windows.Forms.Label
-    $lbl.Font      = New-Object System.Drawing.Font("Segoe UI", 10)
-    $lbl.Location  = New-Object System.Drawing.Point(20, $y)
-    $lbl.Size      = New-Object System.Drawing.Size(520, 24)
-    $status        = Get-TaskStatus $name
-    $lbl.Text      = "  $status   $name"
-    $lbl.ForeColor = if ($status -eq [char]0x2713) { [System.Drawing.Color]::Green } else { [System.Drawing.Color]::Red }
-    $form.Controls.Add($lbl)
+    $lbl = New-Object System.Windows.Forms.Label
+    $lbl.Font = New-Object System.Drawing.Font($MainFont, 10)
+    $lbl.AutoSize = $true
+    $lbl.Margin = "0,0,0,2"
+
+    $status = Get-TaskStatus $name
+    $lbl.Text = "  $status   $name"
+    $lbl.ForeColor = if ($status -eq [char]0x2713) { "Green" } else { "Red" }
+
+    $root.Controls.Add($lbl)
     $taskLabels[$name] = $lbl
-    $y += 26
 }
 
 # --- Watched folders ---
 $lblFolders = New-Object System.Windows.Forms.Label
-$lblFolders.Text     = "Watched folders (backed up by both bihourly and daily):"
-$lblFolders.Font     = New-Object System.Drawing.Font("Segoe UI", 9)
-$lblFolders.Location = New-Object System.Drawing.Point(20, 134)
-$lblFolders.Size     = New-Object System.Drawing.Size(360, 18)
-$form.Controls.Add($lblFolders)
+$lblFolders.Text = "Watched folders. Pick your main work folder(s) that will get automatically backed up."
+$lblFolders.AutoSize = $true
+$lblFolders.Margin = "0,5,0,5"
+$root.Controls.Add($lblFolders)
 
-$btnAddFolder          = New-Object System.Windows.Forms.Button
-$btnAddFolder.Text     = "Add Folder..."
-$btnAddFolder.Font     = New-Object System.Drawing.Font("Segoe UI", 9)
-$btnAddFolder.Location = New-Object System.Drawing.Point(432, 131)
-$btnAddFolder.Size     = New-Object System.Drawing.Size(106, 26)
-$form.Controls.Add($btnAddFolder)
+$lstFolders = New-Object System.Windows.Forms.ListBox
+$lstFolders.Height = 100
+$lstFolders.Width  = 460
+$lstFolders.Items.Add("C:\Users\$env:USERNAME\Desktop\*WORKING*") | Out-Null
+$root.Controls.Add($lstFolders)
 
-$lstFolders          = New-Object System.Windows.Forms.ListBox
-$lstFolders.Font     = New-Object System.Drawing.Font("Segoe UI", 9)
-$lstFolders.Location = New-Object System.Drawing.Point(20, 154)
-$lstFolders.Size     = New-Object System.Drawing.Size(518, 66)
-$lstFolders.Items.Add("C:\Users\$env:USERNAME\Desktop") | Out-Null
-$form.Controls.Add($lstFolders)
+# --- Buttons row ---
+$rowFolders = New-Object System.Windows.Forms.FlowLayoutPanel
+$rowFolders.AutoSize = $true
+$rowFolders.Margin = "0,5,0,5"
 
-$btnRemove          = New-Object System.Windows.Forms.Button
-$btnRemove.Text     = "Remove"
-$btnRemove.Font     = New-Object System.Drawing.Font("Segoe UI", 8)
-$btnRemove.Location = New-Object System.Drawing.Point(432, 222)
-$btnRemove.Size     = New-Object System.Drawing.Size(106, 22)
-$form.Controls.Add($btnRemove)
+$btnAddFolder = New-Object System.Windows.Forms.Button
+$btnAddFolder.AutoSize = $true
+$btnAddFolder.Text = "Add Folder..."
 
+$btnModify = New-Object System.Windows.Forms.Button
+$btnModify.AutoSize = $true
+$btnModify.Text = "Modify"
+
+$btnRemove = New-Object System.Windows.Forms.Button
+$btnRemove.AutoSize = $true
+$btnRemove.Text = "Remove"
+
+$rowFolders.Controls.Add($btnAddFolder)
+$rowFolders.Controls.Add($btnModify)
+$rowFolders.Controls.Add($btnRemove)
+$root.Controls.Add($rowFolders)
+
+# --- Keyword filter ---
+$lblKeywords = New-Object System.Windows.Forms.Label
+$lblKeywords.Text = "File filter keywords (comma separated):"
+$lblKeywords.AutoSize = $true
+$lblKeywords.Margin = "0,10,0,5"
+$root.Controls.Add($lblKeywords)
+
+$rowKeywords = New-Object System.Windows.Forms.FlowLayoutPanel
+$rowKeywords.AutoSize = $true
+
+$txtKeywords = New-Object System.Windows.Forms.TextBox
+$txtKeywords.Text = "WORKING"
+$txtKeywords.Width = 200
+
+$lblKeyHint = New-Object System.Windows.Forms.Label
+$lblKeyHint.Text = "Blank = back up all files"
+$lblKeyHint.ForeColor = "Gray"
+$lblKeyHint.AutoSize = $true
+$lblKeyHint.Margin = "10,5,0,0"
+
+$rowKeywords.Controls.Add($txtKeywords)
+$rowKeywords.Controls.Add($lblKeyHint)
+$root.Controls.Add($rowKeywords)
+
+# --- Repo picker (HTML-like row: label + input + button) ---
+function Add-RepoPicker($labelText, $defaultPath) {
+
+    $container = New-Object System.Windows.Forms.FlowLayoutPanel
+    $container.FlowDirection = "TopDown"
+    $container.AutoSize = $true
+    $container.Margin = "0,10,0,0"
+
+    $lbl = New-Object System.Windows.Forms.Label
+    $lbl.Text = $labelText
+    $lbl.AutoSize = $true
+
+    $row = New-Object System.Windows.Forms.FlowLayoutPanel
+    $row.AutoSize = $true
+
+    $txt = New-Object System.Windows.Forms.TextBox
+    $txt.Text = $defaultPath
+    $txt.Width = 340
+
+    $btn = New-Object System.Windows.Forms.Button
+    $btn.Text = "Browse..."
+
+    $btn.Add_Click({
+        $dlg = New-Object System.Windows.Forms.FolderBrowserDialog
+        $dlg.SelectedPath = $txt.Text
+        if ($dlg.ShowDialog() -eq "OK") { $txt.Text = $dlg.SelectedPath }
+    }.GetNewClosure())
+
+    $row.Controls.Add($txt)
+    $row.Controls.Add($btn)
+
+    $container.Controls.Add($lbl)
+    $container.Controls.Add($row)
+
+    $root.Controls.Add($container)
+
+    return $txt
+}
+
+$txtBihourly = Add-RepoPicker "Bihourly repo folder:" "E:\backups\restic_bihourly"
+$txtDaily    = Add-RepoPicker "Daily repo folder:"    "E:\backups\restic_daily"
+
+# --- Install button ---
+$btnInstall = New-Object System.Windows.Forms.Button
+$btnInstall.Text = "Install backup system into  $InstallPath"
+$btnInstall.Height = 40
+$btnInstall.Width  = 460
+$btnInstall.Margin = "0,15,0,0"
+
+$root.Controls.Add($btnInstall)
+
+# --- KEEP YOUR ORIGINAL EVENT HANDLERS BELOW ---
 $btnAddFolder.Add_Click({
     $dlg              = New-Object System.Windows.Forms.FolderBrowserDialog
     $dlg.Description  = "Select a folder to watch"
@@ -126,44 +212,24 @@ $btnAddFolder.Add_Click({
         }
     }
 })
+
+$btnModify.Add_Click({
+    if ($lstFolders.SelectedIndex -ge 0) {
+
+        $dlg = New-Object System.Windows.Forms.FolderBrowserDialog
+        $dlg.SelectedPath = $lstFolders.SelectedItem.ToString()
+
+        if ($dlg.ShowDialog() -eq [System.Windows.Forms.DialogResult]::OK) {
+            $lstFolders.Items[$lstFolders.SelectedIndex] = $dlg.SelectedPath
+        }
+    }
+}.GetNewClosure())
+
+
 $btnRemove.Add_Click({
     if ($lstFolders.SelectedIndex -ge 0) { $lstFolders.Items.RemoveAt($lstFolders.SelectedIndex) }
 })
 
-# --- Keyword filter ---
-$lblKeywords = New-Object System.Windows.Forms.Label
-$lblKeywords.Text     = "File filter keywords (comma separated):"
-$lblKeywords.Font     = New-Object System.Drawing.Font("Segoe UI", 9)
-$lblKeywords.Location = New-Object System.Drawing.Point(20, 256)
-$lblKeywords.Size     = New-Object System.Drawing.Size(280, 18)
-$form.Controls.Add($lblKeywords)
-
-$txtKeywords          = New-Object System.Windows.Forms.TextBox
-$txtKeywords.Text     = "WORKING"
-$txtKeywords.Font     = New-Object System.Drawing.Font("Segoe UI", 9)
-$txtKeywords.Location = New-Object System.Drawing.Point(20, 276)
-$txtKeywords.Size     = New-Object System.Drawing.Size(200, 24)
-$form.Controls.Add($txtKeywords)
-
-$lblKeyHint           = New-Object System.Windows.Forms.Label
-$lblKeyHint.Text      = "(blank = back up all files)"
-$lblKeyHint.Font      = New-Object System.Drawing.Font("Segoe UI", 8, [System.Drawing.FontStyle]::Italic)
-$lblKeyHint.ForeColor = [System.Drawing.Color]::Gray
-$lblKeyHint.Location  = New-Object System.Drawing.Point(228, 279)
-$lblKeyHint.Size      = New-Object System.Drawing.Size(200, 18)
-$form.Controls.Add($lblKeyHint)
-
-# --- Repo folder pickers ---
-$txtBihourly = Add-RepoPicker "Bihourly repo folder:"  "E:\backups\restic_bihourly" 312
-$txtDaily    = Add-RepoPicker "Daily repo folder:"     "E:\backups\restic_daily"    358
-
-# --- Install button ---
-$btnInstall          = New-Object System.Windows.Forms.Button
-$btnInstall.Text     = "Install backup system into  $InstallPath"
-$btnInstall.Location = New-Object System.Drawing.Point(20, 410)
-$btnInstall.Size     = New-Object System.Drawing.Size(510, 42)
-$btnInstall.Font     = New-Object System.Drawing.Font("Segoe UI", 9)
-$form.Controls.Add($btnInstall)
 
 $btnInstall.Add_Click({
     $btnInstall.Enabled = $false
