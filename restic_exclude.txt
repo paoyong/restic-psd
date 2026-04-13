@@ -1,0 +1,6 @@
+C:\Users\pao\Desktop\*.jpg
+C:\Users\pao\Desktop\*.JPG
+C:\Users\pao\Desktop\*.png
+*.lnk
+restic_restore
+C:\Users\pao\Desktop\programming
