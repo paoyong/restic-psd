@@ -1,7 +1,11 @@
-set USER=C:\Users\pao
-set REPO=backups\restic_bihourly
-set SCRIPTS=C:\Users\pao\Dropbox\backup_scripts
-set SNAPSHOTS=16
+@echo off
+setlocal enabledelayedexpansion
+call "%~dp0config.bat"
 
-restic backup %USER%\Desktop\ -r E:\%REPO% --exclude-file="%SCRIPTS%\restic_exclude.txt" --password-file="%SCRIPTS%\restic_password"
-restic backup %USER%\Desktop\ -r F:\%REPO% --exclude-file="%SCRIPTS%\restic_exclude.txt" --password-file="%SCRIPTS%\restic_password"
+set INCLUDES=
+if not "%KEYWORDS%"=="" (
+    for %%K in (%KEYWORDS%) do set INCLUDES=!INCLUDES! --include=*%%K*
+)
+
+restic backup --files-from="%SCRIPTS%\folders_watched.txt" -r %REPO_BIHOURLY% %INCLUDES% --exclude-file="%SCRIPTS%\restic_exclude.txt" --password-file="%SCRIPTS%\restic_password"
+endlocal
