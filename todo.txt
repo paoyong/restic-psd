@@ -1,1 +1,2 @@
 4. Make it easy to uninstall.
+1. Make backup not show up on terminal, make it run silently (TaskScheduler?)

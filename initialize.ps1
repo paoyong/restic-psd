@@ -457,10 +457,12 @@ function Install-ResticPSD($cfg, $stepLabels) {
     Set-CheckStep $stepLabels 'tasks' 'running'
     Get-ScheduledTask | Where-Object { $_.TaskName -like 'ResticPSD_*' } |
         ForEach-Object { Unregister-ScheduledTask -TaskName $_.TaskName -Confirm:$false }
-    $action  = New-ScheduledTaskAction -Execute "$($cfg.InstallPath)\ResticPSD_bihourly.bat"
+    $action  = New-ScheduledTaskAction -Execute 'powershell.exe' `
+        -Argument "-WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -Command `"& '$($cfg.InstallPath)\ResticPSD_bihourly.bat'`""
     $trigger = New-ScheduledTaskTrigger -At 12am -Once -RepetitionInterval ([TimeSpan]::FromMinutes(30))
     Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'ResticPSD_bihourly' -User $env:USERNAME | Out-Null
-    $action  = New-ScheduledTaskAction -Execute "$($cfg.InstallPath)\ResticPSD_daily.bat"
+    $action  = New-ScheduledTaskAction -Execute 'powershell.exe' `
+        -Argument "-WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -Command `"& '$($cfg.InstallPath)\ResticPSD_daily.bat'`""
     $trigger = New-ScheduledTaskTrigger -Daily -At '9:00 PM'
     Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'ResticPSD_daily' -User $env:USERNAME | Out-Null
 
