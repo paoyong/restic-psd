@@ -14,6 +14,112 @@ $TaskNames   = @('ResticPSD_bihourly', 'ResticPSD_daily')
 $MainFont    = "Segoe UI"
 
 # ---------------------------------------------------------------------------
+# ResticPSD_Restore.ps1 template  (__INSTALL_PATH__, __REPO_BIHOURLY__,
+# __REPO_DAILY__ are replaced with real paths at install time)
+# ---------------------------------------------------------------------------
+$RestoreGuiTemplate = @'
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+$InstallPath  = '__INSTALL_PATH__'
+$RepoBihourly = '__REPO_BIHOURLY__'
+$RepoDaily    = '__REPO_DAILY__'
+$PwFile       = "$InstallPath\restic_password"
+$MainFont     = 'Segoe UI'
+
+function Get-Snapshots($repo) {
+    $json = & restic snapshots --json -r $repo --password-file $PwFile 2>$null
+    if ($json) { try { $json | ConvertFrom-Json } catch { @() } } else { @() }
+}
+
+function Invoke-Restore($repo, $snapId) {
+    $target = "$env:USERPROFILE\Desktop\restic_restore_$snapId"
+    & restic restore $snapId -r $repo --target $target --password-file $PwFile 2>$null
+    if (Test-Path $target) { Start-Process explorer.exe $target }
+}
+
+function Add-SnapshotRows($panel, $repo) {
+    $snaps = Get-Snapshots $repo
+    if ($snaps.Count -eq 0) {
+        $lbl          = New-Object System.Windows.Forms.Label
+        $lbl.Text     = '  No snapshots found.'
+        $lbl.ForeColor = [System.Drawing.Color]::Gray
+        $lbl.AutoSize = $true
+        $panel.Controls.Add($lbl)
+        return
+    }
+    foreach ($snap in ($snaps | Sort-Object time -Descending)) {
+        $row              = New-Object System.Windows.Forms.FlowLayoutPanel
+        $row.FlowDirection = 'LeftToRight'
+        $row.AutoSize     = $true
+        $row.Margin       = '0,0,0,3'
+
+        $lblId           = New-Object System.Windows.Forms.Label
+        $lblId.Text      = $snap.short_id
+        $lblId.Width     = 80
+        $lblId.TextAlign = 'MiddleLeft'
+
+        $dt              = try { [DateTime]::Parse($snap.time).ToLocalTime().ToString('yyyy-MM-dd  HH:mm') } catch { $snap.time }
+        $lblDate         = New-Object System.Windows.Forms.Label
+        $lblDate.Text    = $dt
+        $lblDate.Width   = 160
+        $lblDate.TextAlign = 'MiddleLeft'
+
+        $btn         = New-Object System.Windows.Forms.Button
+        $btn.Text    = 'Restore Snapshot'
+        $btn.AutoSize = $true
+
+        $snapId  = $snap.short_id
+        $repoRef = $repo
+        $btn.Add_Click({
+            $btn.Enabled = $false
+            $btn.Text    = 'Restoring...'
+            $form.Refresh()
+            Invoke-Restore $repoRef $snapId
+            $btn.Text = "Restored $([char]0x2713)"
+        }.GetNewClosure())
+
+        $row.Controls.Add($lblId)
+        $row.Controls.Add($lblDate)
+        $row.Controls.Add($btn)
+        $panel.Controls.Add($row)
+    }
+}
+
+$form                  = New-Object System.Windows.Forms.Form
+$form.Text             = 'ResticPSD - Restore Snapshots'
+$form.AutoSize         = $true
+$form.AutoSizeMode     = 'GrowAndShrink'
+$form.StartPosition    = 'CenterScreen'
+$form.FormBorderStyle  = 'FixedDialog'
+$form.MaximizeBox      = $false
+$form.Font             = New-Object System.Drawing.Font($MainFont, 9)
+
+$root               = New-Object System.Windows.Forms.FlowLayoutPanel
+$root.FlowDirection = 'TopDown'
+$root.WrapContents  = $false
+$root.AutoSize      = $true
+$root.Dock          = 'Fill'
+$root.Padding       = New-Object System.Windows.Forms.Padding(15)
+$form.Controls.Add($root)
+
+foreach ($section in @(
+    @{ Label = 'Bihourly'; Repo = $RepoBihourly; Margin = '0,0,0,5'  },
+    @{ Label = 'Daily';    Repo = $RepoDaily;    Margin = '0,12,0,5' }
+)) {
+    $lbl           = New-Object System.Windows.Forms.Label
+    $lbl.Text      = $section.Label
+    $lbl.Font      = New-Object System.Drawing.Font($MainFont, 11, [System.Drawing.FontStyle]::Bold)
+    $lbl.AutoSize  = $true
+    $lbl.Margin    = $section.Margin
+    $root.Controls.Add($lbl)
+    Add-SnapshotRows $root $section.Repo
+}
+
+$form.ShowDialog() | Out-Null
+'@
+
+# ---------------------------------------------------------------------------
 # Checklist helper  (reads $form from outer scope for Refresh)
 # ---------------------------------------------------------------------------
 function Set-CheckStep($labels, $key, $state) {
@@ -121,6 +227,12 @@ function Install-ResticPSD($cfg, $stepLabels, $shortcuts) {
 
     New-RestoreBat 'REPO_DAILY' 'daily' |
         Set-Content "$($cfg.InstallPath)\RestoreToDesktop_daily.bat"
+
+    $RestoreGuiTemplate `
+        -replace '__INSTALL_PATH__',  $cfg.InstallPath `
+        -replace '__REPO_BIHOURLY__', $cfg.RepoBihourly `
+        -replace '__REPO_DAILY__',    $cfg.RepoDaily |
+        Set-Content "$($cfg.InstallPath)\ResticPSD_Restore.ps1" -Encoding UTF8
 
     Copy-Item "$($cfg.InstallPath)\restic_0.16.3_windows_amd64.exe" 'C:\Windows\System32\restic.exe' -Force
     Set-CheckStep $stepLabels 'scripts' 'done'
