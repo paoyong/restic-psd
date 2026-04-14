@@ -1,4 +1,4 @@
-# initialize.ps1 - ResticPSD one-click installer
+# initialize.ps1 - ResticPSD installer
 
 # --- Self-elevate to Administrator ---
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")) {
@@ -10,151 +10,146 @@ Add-Type -AssemblyName System.Drawing
 
 $ScriptDir   = Split-Path -Parent $MyInvocation.MyCommand.Path
 $InstallPath = "C:\Program Files\ResticPSD"
-$TaskNames   = @("ResticBihourly", "ResticDaily")
+$TaskNames   = @('ResticPSD_bihourly', 'ResticPSD_daily')
 $MainFont    = "Segoe UI"
 
 # ---------------------------------------------------------------------------
-# Read-Config: parse config.txt into the same $cfg shape as the UI produces.
-# Usage: $cfg = Read-Config "C:\path\to\config.txt" ; Install-ResticPSD $cfg
+# Checklist helper  (reads $form from outer scope for Refresh)
 # ---------------------------------------------------------------------------
-function Read-Config($path) {
-    $cfg = @{
-        InstallPath       = $InstallPath
-        RepoBihourly      = 'E:\backups\restic_bihourly'
-        RepoDaily         = 'E:\backups\restic_daily'
-        Keywords          = 'WORKING'
-        Folders           = @()
-        SnapshotsBihourly = 5
-        SnapshotsDaily    = 3
-        IntervalMinutes   = 30
-        IntervalHours     = 24
-        Exclude           = @()
+function Set-CheckStep($labels, $key, $state) {
+    $icon  = switch ($state) {
+        'pending' { [char]0x25CB }   # ○
+        'running' { [char]0x25BA }   # ►
+        'done'    { [char]0x2713 }   # ✓
+        'error'   { [char]0x2717 }   # ✗
     }
-    $section = ''
-    foreach ($line in (Get-Content $path)) {
-        $line = $line.Trim()
-        if ($line -eq '' -or $line.StartsWith('#')) { continue }
-        if ($line -match '^\[(.+)\]$') { $section = $Matches[1]; continue }
-        switch ($section) {
-            'settings' {
-                if ($line -match '^(\w+)=(.*)$') {
-                    switch ($Matches[1]) {
-                        'REPO_BIHOURLY'      { $cfg.RepoBihourly      = $Matches[2] }
-                        'REPO_DAILY'         { $cfg.RepoDaily         = $Matches[2] }
-                        'KEYWORDS'           { $cfg.Keywords          = $Matches[2] }
-                        'SNAPSHOTS_BIHOURLY' { $cfg.SnapshotsBihourly = [int]$Matches[2] }
-                        'SNAPSHOTS_DAILY'    { $cfg.SnapshotsDaily    = [int]$Matches[2] }
-                        'INTERVAL_MINUTES'   { $cfg.IntervalMinutes   = [int]$Matches[2] }
-                        'INTERVAL_HOURS'     { $cfg.IntervalHours     = [int]$Matches[2] }
-                    }
-                }
-            }
-            'folders_watched' { $cfg.Folders += $line }
-            'exclude'         { $cfg.Exclude += $line }
-        }
+    $color = switch ($state) {
+        'pending' { [System.Drawing.Color]::Silver }
+        'running' { [System.Drawing.Color]::FromArgb(0, 120, 215) }
+        'done'    { [System.Drawing.Color]::Green }
+        'error'   { [System.Drawing.Color]::Red }
     }
-    return $cfg
+    $labels[$key].Text      = "  $icon  $($labels[$key].Tag)"
+    $labels[$key].ForeColor = $color
+    $form.Refresh()
 }
 
 # ---------------------------------------------------------------------------
-# Install-ResticPSD: pure install logic — no UI references.
-# Generates all files at the install location from $cfg.
+# Uninstall-ResticPSD
 # ---------------------------------------------------------------------------
-function Install-ResticPSD($cfg) {
-    $fastScript  = "restic_$($cfg.IntervalMinutes)min.bat"
-    $dailyScript = "restic_$($cfg.IntervalHours)hr.bat"
+function Uninstall-ResticPSD($installPath) {
+    Get-ScheduledTask | Where-Object { $_.TaskName -like 'ResticPSD_*' } |
+        ForEach-Object { Unregister-ScheduledTask -TaskName $_.TaskName -Confirm:$false }
 
-    # 1. Create install dir and copy static files
+    if (Test-Path $installPath)                     { Remove-Item $installPath -Recurse -Force }
+    if (Test-Path 'C:\Windows\System32\restic.exe') { Remove-Item 'C:\Windows\System32\restic.exe' -Force }
+
+    foreach ($lnk in @(
+        "C:\Users\$env:USERNAME\Desktop\ResticPSD - Restore to Desktop.lnk",
+        "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\ResticPSD - Restore to Desktop.lnk"
+    )) { if (Test-Path $lnk) { Remove-Item $lnk -Force } }
+}
+
+# ---------------------------------------------------------------------------
+# Install-ResticPSD
+# ---------------------------------------------------------------------------
+function Install-ResticPSD($cfg, $stepLabels, $shortcuts) {
+
+    # 1. Uninstall previous
+    Set-CheckStep $stepLabels 'uninstall' 'running'
+    Uninstall-ResticPSD $cfg.InstallPath
+    Set-CheckStep $stepLabels 'uninstall' 'done'
+
+    # 2. Copy files to install location
+    Set-CheckStep $stepLabels 'files' 'running'
     New-Item -ItemType Directory -Path $cfg.InstallPath -Force | Out-Null
-    foreach ($f in @('restic_0.16.3_windows_amd64.exe', 'restic_password', 'restore_to_desktop.ps1')) {
-        Copy-Item "$ScriptDir\$f" $cfg.InstallPath -Force
-    }
-
-    # 2. Generate config.bat
+    Copy-Item "$ScriptDir\restic_0.16.3_windows_amd64.exe" $cfg.InstallPath -Force
+    'restic123' | Set-Content "$($cfg.InstallPath)\restic_password"
     @(
         "set INSTALL_PATH=$($cfg.InstallPath)",
         "set REPO_BIHOURLY=$($cfg.RepoBihourly)",
         "set REPO_DAILY=$($cfg.RepoDaily)",
-        "set SNAPSHOTS_BIHOURLY=$($cfg.SnapshotsBihourly)",
-        "set SNAPSHOTS_DAILY=$($cfg.SnapshotsDaily)",
-        "set KEYWORDS=$($cfg.Keywords)"
+        "set SNAPSHOTS_BIHOURLY=5",
+        "set SNAPSHOTS_DAILY=3"
     ) -join "`r`n" | Set-Content "$($cfg.InstallPath)\config.bat"
-
-    # 3. Generate folders_watched.txt
-    $cfg.Folders | Set-Content "$($cfg.InstallPath)\folders_watched.txt"
-
-    # 4. Generate restic_exclude.txt
-    if ($cfg.Exclude.Count -gt 0) {
-        $cfg.Exclude | Set-Content "$($cfg.InstallPath)\restic_exclude.txt"
+    $folderEntries = if ($cfg.Keyword) {
+        $cfg.Folders | ForEach-Object { "$_\*$($cfg.Keyword)*" }
     } else {
-        '' | Set-Content "$($cfg.InstallPath)\restic_exclude.txt"
+        $cfg.Folders
     }
+    $folderEntries | Set-Content "$($cfg.InstallPath)\folders_watched.txt"
+    @('*.lnk', 'restic_restore') -join "`r`n" | Set-Content "$($cfg.InstallPath)\restic_exclude.txt"
+    Set-CheckStep $stepLabels 'files' 'done'
 
-    # 5. Generate restic_Xmin.bat  (fast interval backup)
+    # 3. Generate backup scripts
+    Set-CheckStep $stepLabels 'scripts' 'running'
     @(
         '@echo off',
-        'setlocal enabledelayedexpansion',
         'call "%~dp0config.bat"',
         '',
-        'set INCLUDES=',
-        'if not "%KEYWORDS%"=="" (',
-        '    for %%K in (%KEYWORDS%) do set INCLUDES=!INCLUDES! --include=*%%K*',
-        ')',
-        '',
-        'restic backup --files-from="%INSTALL_PATH%\folders_watched.txt" -r %REPO_BIHOURLY% %INCLUDES% --exclude-file="%INSTALL_PATH%\restic_exclude.txt" --password-file="%INSTALL_PATH%\restic_password"',
-        'endlocal'
-    ) -join "`r`n" | Set-Content "$($cfg.InstallPath)\$fastScript"
-
-    # 6. Generate restic_Xhr.bat  (daily backup + prune)
+        'restic backup --files-from="%INSTALL_PATH%\folders_watched.txt" -r %REPO_BIHOURLY% --exclude-file="%INSTALL_PATH%\restic_exclude.txt" --password-file="%INSTALL_PATH%\restic_password"'
+    ) -join "`r`n" | Set-Content "$($cfg.InstallPath)\ResticPSD_bihourly.bat"
     @(
         '@echo off',
-        'setlocal enabledelayedexpansion',
         'call "%~dp0config.bat"',
         '',
-        'set INCLUDES=',
-        'if not "%KEYWORDS%"=="" (',
-        '    for %%K in (%KEYWORDS%) do set INCLUDES=!INCLUDES! --include=*%%K*',
-        ')',
-        '',
-        'restic backup --files-from="%INSTALL_PATH%\folders_watched.txt" -r %REPO_DAILY% %INCLUDES% --exclude-file="%INSTALL_PATH%\restic_exclude.txt" --password-file="%INSTALL_PATH%\restic_password"',
+        'restic backup --files-from="%INSTALL_PATH%\folders_watched.txt" -r %REPO_DAILY% --exclude-file="%INSTALL_PATH%\restic_exclude.txt" --password-file="%INSTALL_PATH%\restic_password"',
         '',
         'restic -r %REPO_DAILY%    forget --keep-last %SNAPSHOTS_DAILY%    --prune --password-file="%INSTALL_PATH%\restic_password"',
-        'restic -r %REPO_BIHOURLY% forget --keep-last %SNAPSHOTS_BIHOURLY% --prune --password-file="%INSTALL_PATH%\restic_password"',
-        'endlocal'
-    ) -join "`r`n" | Set-Content "$($cfg.InstallPath)\$dailyScript"
+        'restic -r %REPO_BIHOURLY% forget --keep-last %SNAPSHOTS_BIHOURLY% --prune --password-file="%INSTALL_PATH%\restic_password"'
+    ) -join "`r`n" | Set-Content "$($cfg.InstallPath)\ResticPSD_daily.bat"
+    # RestoreToDesktop_bihourly.bat
+    @(
+        '@echo off',
+        'call "%~dp0config.bat"',
+        'set TARGET=%USERPROFILE%\Desktop\restic_restore_bihourly',
+        'restic restore latest -r %REPO_BIHOURLY% --target "%TARGET%" --password-file "%INSTALL_PATH%\restic_password"',
+        'echo.',
+        'echo Restored to %TARGET%',
+        'pause'
+    ) -join "`r`n" | Set-Content "$($cfg.InstallPath)\RestoreToDesktop_bihourly.bat"
 
-    # 7. Put restic.exe on PATH via System32
+    # RestoreToDesktop_daily.bat
+    @(
+        '@echo off',
+        'call "%~dp0config.bat"',
+        'set TARGET=%USERPROFILE%\Desktop\restic_restore_daily',
+        'restic restore latest -r %REPO_DAILY% --target "%TARGET%" --password-file "%INSTALL_PATH%\restic_password"',
+        'echo.',
+        'echo Restored to %TARGET%',
+        'pause'
+    ) -join "`r`n" | Set-Content "$($cfg.InstallPath)\RestoreToDesktop_daily.bat"
+
     Copy-Item "$($cfg.InstallPath)\restic_0.16.3_windows_amd64.exe" 'C:\Windows\System32\restic.exe' -Force
+    Set-CheckStep $stepLabels 'scripts' 'done'
 
-    # 8. Init repos (safe if already initialised)
+    # 4. Initialize backup repositories
+    Set-CheckStep $stepLabels 'repos' 'running'
     $pw = "--password-file=`"$($cfg.InstallPath)\restic_password`""
     foreach ($repo in @($cfg.RepoBihourly, $cfg.RepoDaily)) {
+        New-Item -ItemType Directory -Path $repo -Force | Out-Null
         Invoke-Expression "restic init --repo `"$repo`" $pw" 2>$null
     }
+    Set-CheckStep $stepLabels 'repos' 'done'
 
-    # 9. Recreate scheduled tasks
-    foreach ($name in $TaskNames) {
-        Unregister-ScheduledTask -TaskName $name -Confirm:$false -ErrorAction SilentlyContinue
-    }
-    $action  = New-ScheduledTaskAction -Execute "$($cfg.InstallPath)\$fastScript"
-    $trigger = New-ScheduledTaskTrigger -At 12am -Once -RepetitionInterval ([TimeSpan]::FromMinutes($cfg.IntervalMinutes))
-    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName $TaskNames[0] -User $env:USERNAME | Out-Null
-
-    $action  = New-ScheduledTaskAction -Execute "$($cfg.InstallPath)\$dailyScript"
+    # 5. Schedule backup tasks
+    Set-CheckStep $stepLabels 'tasks' 'running'
+    Get-ScheduledTask | Where-Object { $_.TaskName -like 'ResticPSD_*' } |
+        ForEach-Object { Unregister-ScheduledTask -TaskName $_.TaskName -Confirm:$false }
+    $action  = New-ScheduledTaskAction -Execute "$($cfg.InstallPath)\ResticPSD_bihourly.bat"
+    $trigger = New-ScheduledTaskTrigger -At 12am -Once -RepetitionInterval ([TimeSpan]::FromMinutes(30))
+    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'ResticPSD_bihourly' -User $env:USERNAME | Out-Null
+    $action  = New-ScheduledTaskAction -Execute "$($cfg.InstallPath)\ResticPSD_daily.bat"
     $trigger = New-ScheduledTaskTrigger -Daily -At '9:00 PM'
-    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName $TaskNames[1] -User $env:USERNAME | Out-Null
+    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'ResticPSD_daily' -User $env:USERNAME | Out-Null
+    Set-CheckStep $stepLabels 'tasks' 'done'
 
-    foreach ($name in $TaskNames) {
-        Start-ScheduledTask -TaskName $name -ErrorAction SilentlyContinue
-    }
+    # 6. Run first backup session (blocking — wait for both to finish)
+    Set-CheckStep $stepLabels 'backup' 'running'
+    Start-Process -FilePath "$($cfg.InstallPath)\ResticPSD_bihourly.bat" -Wait -NoNewWindow
+    Start-Process -FilePath "$($cfg.InstallPath)\ResticPSD_daily.bat"    -Wait -NoNewWindow
+    Set-CheckStep $stepLabels 'backup' 'done'
 
-    # 10. Create desktop shortcut to restore script
-    $shell            = New-Object -ComObject WScript.Shell
-    $shortcut         = $shell.CreateShortcut("C:\Users\$env:USERNAME\Desktop\Restore Files to Desktop.lnk")
-    $shortcut.TargetPath  = 'powershell.exe'
-    $shortcut.Arguments   = "-ExecutionPolicy Bypass -File `"$($cfg.InstallPath)\restore_to_desktop.ps1`""
-    $shortcut.Description = 'Restore latest backup to Desktop'
-    $shortcut.Save()
 }
 
 # ---------------------------------------------------------------------------
@@ -185,12 +180,14 @@ $root.Dock          = 'Fill'
 $root.Padding       = New-Object System.Windows.Forms.Padding(15)
 $form.Controls.Add($root)
 
-# Task status
-$lblSub          = New-Object System.Windows.Forms.Label
-$lblSub.Text     = 'Scheduled task status:'
-$lblSub.AutoSize = $true
-$lblSub.Margin   = '0,0,0,5'
-$root.Controls.Add($lblSub)
+# --- Scheduled task status ---V:
+
+
+$lblTaskStatus          = New-Object System.Windows.Forms.Label
+$lblTaskStatus.Text     = 'Scheduled task status:'
+$lblTaskStatus.AutoSize = $true
+$lblTaskStatus.Margin   = '0,0,0,5'
+$root.Controls.Add($lblTaskStatus)
 
 $taskLabels = @{}
 foreach ($name in $TaskNames) {
@@ -205,9 +202,9 @@ foreach ($name in $TaskNames) {
     $taskLabels[$name] = $lbl
 }
 
-# Watched folders
+# --- Watched folders ---
 $lblFolders          = New-Object System.Windows.Forms.Label
-$lblFolders.Text     = 'Watched folders. Pick your main work folder(s) that will get automatically backed up.'
+$lblFolders.Text     = 'Watched folders:'
 $lblFolders.AutoSize = $true
 $lblFolders.Margin   = '0,10,0,5'
 $root.Controls.Add($lblFolders)
@@ -220,7 +217,7 @@ $root.Controls.Add($lstFolders)
 
 $rowFolders            = New-Object System.Windows.Forms.FlowLayoutPanel
 $rowFolders.AutoSize   = $true
-$rowFolders.Margin     = '0,5,0,5'
+$rowFolders.Margin     = '0,4,0,0'
 $btnAddFolder          = New-Object System.Windows.Forms.Button
 $btnAddFolder.AutoSize = $true
 $btnAddFolder.Text     = 'Add Folder...'
@@ -235,66 +232,143 @@ $rowFolders.Controls.Add($btnModify)
 $rowFolders.Controls.Add($btnRemove)
 $root.Controls.Add($rowFolders)
 
-# Keyword filter
-$lblKeywords          = New-Object System.Windows.Forms.Label
-$lblKeywords.Text     = 'File filter keywords (comma separated):'
-$lblKeywords.AutoSize = $true
-$lblKeywords.Margin   = '0,10,0,5'
-$root.Controls.Add($lblKeywords)
+# --- Keyword filter ---
+$chkKeyword          = New-Object System.Windows.Forms.CheckBox
+$chkKeyword.Text     = 'Change keyword'
+$chkKeyword.AutoSize = $true
+$chkKeyword.Checked  = $false
+$chkKeyword.Margin   = '0,10,0,3'
+$root.Controls.Add($chkKeyword)
 
-$rowKeywords         = New-Object System.Windows.Forms.FlowLayoutPanel
-$rowKeywords.AutoSize = $true
-$txtKeywords         = New-Object System.Windows.Forms.TextBox
-$txtKeywords.Text    = 'WORKING'
-$txtKeywords.Width   = 200
-$lblKeyHint           = New-Object System.Windows.Forms.Label
-$lblKeyHint.Text      = 'Blank = back up all files'
-$lblKeyHint.ForeColor = 'Gray'
-$lblKeyHint.AutoSize  = $true
-$lblKeyHint.Margin    = '10,5,0,0'
-$rowKeywords.Controls.Add($txtKeywords)
-$rowKeywords.Controls.Add($lblKeyHint)
-$root.Controls.Add($rowKeywords)
+$txtKeyword           = New-Object System.Windows.Forms.TextBox
+$txtKeyword.Text      = 'WORKING'
+$txtKeyword.Width     = 200
+$txtKeyword.Enabled   = $false
+$txtKeyword.ForeColor = [System.Drawing.Color]::Gray
+$root.Controls.Add($txtKeyword)
 
-# Repo pickers
-function Add-RepoPicker($labelText, $defaultPath) {
-    $container                = New-Object System.Windows.Forms.FlowLayoutPanel
-    $container.FlowDirection  = 'TopDown'
-    $container.AutoSize       = $true
-    $container.Margin         = '0,10,0,0'
-    $lbl                      = New-Object System.Windows.Forms.Label
-    $lbl.Text                 = $labelText
-    $lbl.AutoSize             = $true
-    $row                      = New-Object System.Windows.Forms.FlowLayoutPanel
-    $row.AutoSize             = $true
-    $txt                      = New-Object System.Windows.Forms.TextBox
-    $txt.Text                 = $defaultPath
-    $txt.Width                = 340
-    $btn                      = New-Object System.Windows.Forms.Button
-    $btn.Text                 = 'Browse...'
-    $btn.Add_Click({
-        $dlg              = New-Object System.Windows.Forms.FolderBrowserDialog
-        $dlg.SelectedPath = $txt.Text
-        if ($dlg.ShowDialog() -eq 'OK') { $txt.Text = $dlg.SelectedPath }
-    }.GetNewClosure())
-    $row.Controls.Add($txt)
-    $row.Controls.Add($btn)
-    $container.Controls.Add($lbl)
-    $container.Controls.Add($row)
-    $root.Controls.Add($container)
-    return $txt
+$chkKeyword.Add_CheckedChanged({
+    $txtKeyword.Enabled   = $chkKeyword.Checked
+    $txtKeyword.ForeColor = if ($chkKeyword.Checked) {
+        [System.Drawing.Color]::Black
+    } else {
+        [System.Drawing.Color]::Gray
+    }
+})
+
+# --- Backup folder picker ---
+$lblBackupRoot          = New-Object System.Windows.Forms.Label
+$lblBackupRoot.Text     = 'Backup folder:'
+$lblBackupRoot.AutoSize = $true
+$lblBackupRoot.Margin   = '0,10,0,5'
+$root.Controls.Add($lblBackupRoot)
+
+$rowBackupRoot         = New-Object System.Windows.Forms.FlowLayoutPanel
+$rowBackupRoot.AutoSize = $true
+
+$txtBackupRoot         = New-Object System.Windows.Forms.TextBox
+$txtBackupRoot.Text    = 'E:\backups'
+$txtBackupRoot.Width   = 340
+
+$btnBackupRoot         = New-Object System.Windows.Forms.Button
+$btnBackupRoot.Text    = 'Browse...'
+$btnBackupRoot.Add_Click({
+    $dlg              = New-Object System.Windows.Forms.FolderBrowserDialog
+    $dlg.SelectedPath = $txtBackupRoot.Text
+    if ($dlg.ShowDialog() -eq 'OK') { $txtBackupRoot.Text = $dlg.SelectedPath }
+})
+
+$lblBackupHint          = New-Object System.Windows.Forms.Label
+$lblBackupHint.AutoSize = $true
+$lblBackupHint.Margin   = '0,6,0,0'
+$lblBackupHint.ForeColor = [System.Drawing.Color]::Gray
+
+$txtBackupRoot.Add_TextChanged({
+    $r = $txtBackupRoot.Text.TrimEnd('\')
+    $lblBackupHint.Text = "  $r\bihourly_backups    $r\daily_backups"
+})
+$r = $txtBackupRoot.Text.TrimEnd('\')
+$lblBackupHint.Text = "  $r\bihourly_backups    $r\daily_backups"
+
+$rowBackupRoot.Controls.Add($txtBackupRoot)
+$rowBackupRoot.Controls.Add($btnBackupRoot)
+$root.Controls.Add($rowBackupRoot)
+$root.Controls.Add($lblBackupHint)
+
+# --- Shortcut placement checkboxes ---
+$lblShortcuts          = New-Object System.Windows.Forms.Label
+$lblShortcuts.Text     = 'Place "Restore to Desktop" shortcut in:'
+$lblShortcuts.AutoSize = $true
+$lblShortcuts.Margin   = '0,12,0,4'
+$root.Controls.Add($lblShortcuts)
+
+$rowShortcuts          = New-Object System.Windows.Forms.FlowLayoutPanel
+$rowShortcuts.AutoSize = $true
+$rowShortcuts.Margin   = '0,0,0,0'
+
+$chkDesktop           = New-Object System.Windows.Forms.CheckBox
+$chkDesktop.Text      = 'Desktop'
+$chkDesktop.Checked   = $true
+$chkDesktop.AutoSize  = $true
+$chkDesktop.Margin    = '0,0,14,0'
+
+$chkStartMenu         = New-Object System.Windows.Forms.CheckBox
+$chkStartMenu.Text    = 'Start Menu'
+$chkStartMenu.Checked = $true
+$chkStartMenu.AutoSize = $true
+$chkStartMenu.Margin  = '0,0,0,0'
+
+$rowShortcuts.Controls.Add($chkDesktop)
+$rowShortcuts.Controls.Add($chkStartMenu)
+$root.Controls.Add($rowShortcuts)
+
+# --- Install checklist ---
+$lblChecklist          = New-Object System.Windows.Forms.Label
+$lblChecklist.Text     = 'Install steps:'
+$lblChecklist.AutoSize = $true
+$lblChecklist.Margin   = '0,12,0,3'
+$root.Controls.Add($lblChecklist)
+
+$stepDefs = @(
+    @{ Key = 'uninstall'; Text = 'Uninstall previous installation' }
+    @{ Key = 'files';     Text = 'Copy files to install location' }
+    @{ Key = 'scripts';   Text = 'Generate backup scripts' }
+    @{ Key = 'repos';     Text = 'Initialize backup repositories' }
+    @{ Key = 'tasks';     Text = 'Schedule backup tasks' }
+    @{ Key = 'backup';    Text = 'Run first backup session' }
+    @{ Key = 'shortcuts'; Text = 'Create shortcuts' }
+)
+
+$stepLabels = @{}
+foreach ($step in $stepDefs) {
+    $lbl           = New-Object System.Windows.Forms.Label
+    $lbl.Tag       = $step.Text
+    $lbl.Text      = "  $([char]0x25CB)  $($step.Text)"
+    $lbl.AutoSize  = $true
+    $lbl.ForeColor = [System.Drawing.Color]::Silver
+    $lbl.Margin    = '0,0,0,1'
+    $root.Controls.Add($lbl)
+    $stepLabels[$step.Key] = $lbl
 }
 
-$txtBihourly = Add-RepoPicker 'Bihourly repo folder:' 'E:\backups\restic_bihourly'
-$txtDaily    = Add-RepoPicker 'Daily repo folder:'    'E:\backups\restic_daily'
+# --- Install / Uninstall buttons ---
+$rowActions          = New-Object System.Windows.Forms.FlowLayoutPanel
+$rowActions.AutoSize = $true
+$rowActions.Margin   = '0,10,0,0'
 
-# Install button
 $btnInstall        = New-Object System.Windows.Forms.Button
-$btnInstall.Text   = "Install backup system into  $InstallPath"
+$btnInstall.Text   = "Install into  $InstallPath"
 $btnInstall.Height = 40
-$btnInstall.Width  = 460
-$btnInstall.Margin = '0,15,0,0'
-$root.Controls.Add($btnInstall)
+$btnInstall.Width  = 340
+
+$btnUninstall        = New-Object System.Windows.Forms.Button
+$btnUninstall.Text   = 'Uninstall'
+$btnUninstall.Height = 40
+$btnUninstall.Width  = 110
+
+$rowActions.Controls.Add($btnInstall)
+$rowActions.Controls.Add($btnUninstall)
+$root.Controls.Add($rowActions)
 
 # ---------------------------------------------------------------------------
 # Event handlers
@@ -325,28 +399,31 @@ $btnRemove.Add_Click({
 })
 
 $btnInstall.Add_Click({
-    $btnInstall.Enabled = $false
-    $btnInstall.Text    = 'Installing...'
-    $form.Refresh()
+    $btnInstall.Enabled   = $false
+    $btnUninstall.Enabled = $false
+    $btnInstall.Text      = 'Installing...'
 
+    # Reset checklist to pending
+    foreach ($step in $stepDefs) { Set-CheckStep $stepLabels $step.Key 'pending' }
+
+    $backupRoot  = $txtBackupRoot.Text.TrimEnd('\')
     $cfg = @{
-        InstallPath       = $InstallPath
-        RepoBihourly      = $txtBihourly.Text
-        RepoDaily         = $txtDaily.Text
-        Keywords          = $txtKeywords.Text
-        Folders           = @($lstFolders.Items)
-        SnapshotsBihourly = 5
-        SnapshotsDaily    = 3
-        IntervalMinutes   = 30
-        IntervalHours     = 24
-        Exclude           = @()
+        InstallPath  = $InstallPath
+        RepoBihourly = "$backupRoot\bihourly_backups"
+        RepoDaily    = "$backupRoot\daily_backups"
+        Folders      = @($lstFolders.Items)
+        Keyword      = $txtKeyword.Text.Trim()
+    }
+    $shortcuts = @{
+        Desktop   = $chkDesktop.Checked
+        StartMenu = $chkStartMenu.Checked
     }
 
-    Install-ResticPSD $cfg
+    Install-ResticPSD $cfg $stepLabels $shortcuts
 
     foreach ($name in $TaskNames) {
         $status = Get-TaskStatus $name
-        $taskLabels[$name].Text     = "  $status   $name"
+        $taskLabels[$name].Text      = "  $status   $name"
         $taskLabels[$name].ForeColor = if ($status -eq [char]0x2713) { 'Green' } else { 'Red' }
     }
 
@@ -357,7 +434,43 @@ $btnInstall.Add_Click({
         [System.Windows.Forms.MessageBoxIcon]::Information
     ) | Out-Null
 
-    $btnInstall.Text = "Installed  $([char]0x2713)"
+    $btnInstall.Text      = "Installed  $([char]0x2713)"
+    $btnInstall.Enabled   = $true
+    $btnUninstall.Enabled = $true
+})
+
+$btnUninstall.Add_Click({
+    $confirm = [System.Windows.Forms.MessageBox]::Show(
+        "This will remove all ResticPSD scheduled tasks and delete`n$InstallPath`n`nYour backup repos will NOT be deleted.`n`nContinue?",
+        'Uninstall ResticPSD',
+        [System.Windows.Forms.MessageBoxButtons]::YesNo,
+        [System.Windows.Forms.MessageBoxIcon]::Warning
+    )
+    if ($confirm -ne [System.Windows.Forms.DialogResult]::Yes) { return }
+
+    $btnInstall.Enabled   = $false
+    $btnUninstall.Enabled = $false
+    $btnUninstall.Text    = 'Uninstalling...'
+    $form.Refresh()
+
+    Uninstall-ResticPSD $InstallPath
+
+    foreach ($name in $TaskNames) {
+        $status = Get-TaskStatus $name
+        $taskLabels[$name].Text      = "  $status   $name"
+        $taskLabels[$name].ForeColor = if ($status -eq [char]0x2713) { 'Green' } else { 'Red' }
+    }
+
+    [System.Windows.Forms.MessageBox]::Show(
+        'ResticPSD has been uninstalled.',
+        'Uninstall Complete',
+        [System.Windows.Forms.MessageBoxButtons]::OK,
+        [System.Windows.Forms.MessageBoxIcon]::Information
+    ) | Out-Null
+
+    $btnUninstall.Text    = 'Uninstall'
+    $btnInstall.Enabled   = $true
+    $btnUninstall.Enabled = $true
 })
 
 $form.ShowDialog() | Out-Null
