@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ResticPSD</title>
+</head>
+<body>
+
+<h1>ResticPSD</h1>
+
+<p>Robust, immutable backup system for your working files. Build on <a href="https://restic.net/">restic</a>.</p>
+
+<h2>Simple</h2>
+  <p>Install, setting folders to be watched. In those folders, just add "WORKING" to the filename. Those files will be backed up, every 30 minutes and once daily.</p>
+<h2>Robust</h2>
+  <p>This program essentially sets up two Windows Task Scheduler that runs generated backup script every 30 minutes and daily. And gives you a GUI to run <code>restic restore</code> commands. </p>
+    <p>On top of that, this is an <a href="https://en.wikipedia.org/wiki/Immutable_object">immutable</a> program. That means, once you set it up, there's no changing things. It's a fixed size wrench. This is so there is as <i>little moving parts as possible</i>.</p>
+<h2>Versioning</h2>
+  <p>Bihourly has 5 snapshots</p>
+  <p>Daily has 3 snapshots</p>
+  <h2>Changing Settings</h2>
+  <p>Got a new drive? Got a new folder you want to watch? New keyword? Download the program, press the uninstall button, and reinstall! All old repos will have to be manually deleted by you.</p>
+  
+  <h2>Download</h2>
+
+<p><a href="https://github.com/paoyong/restic-psd/releases/latest">Download Latest Release</a></p>
+
+</body>
+</html>
