@@ -14,10 +14,9 @@ $TaskNames   = @('ResticPSD_bihourly', 'ResticPSD_daily')
 $MainFont    = "Segoe UI"
 
 # ---------------------------------------------------------------------------
-# ResticPSD_Restore.ps1 template  (__INSTALL_PATH__, __REPO_BIHOURLY__,
-# __REPO_DAILY__ are replaced with real paths at install time)
+# ResticPSD_ControlPanel.ps1 template
 # ---------------------------------------------------------------------------
-$RestoreGuiTemplate = @'
+$ControlPanelTemplate = @'
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
@@ -27,9 +26,47 @@ $RepoDaily    = '__REPO_DAILY__'
 $PwFile       = "$InstallPath\restic_password"
 $MainFont     = 'Segoe UI'
 
+# --- Shared helpers ---
 function Get-Snapshots($repo) {
+    if (-not (Test-Path $repo)) { return @() }
     $json = & restic snapshots --json -r $repo --password-file $PwFile 2>$null
     if ($json) { try { $json | ConvertFrom-Json } catch { @() } } else { @() }
+}
+
+function Get-LastSnapshotTime($repo) {
+    $snaps = Get-Snapshots $repo
+    if ($snaps.Count -gt 0) { try { [DateTime]::Parse(($snaps | Select-Object -Last 1).time) } catch { $null } }
+    else { $null }
+}
+
+function Format-TimeAgo($dt) {
+    if ($null -eq $dt) { return 'no snapshots' }
+    $ago = [DateTime]::UtcNow - $dt.ToUniversalTime()
+    if ($ago.TotalMinutes -lt 60) { return "$([int]$ago.TotalMinutes)m ago" }
+    if ($ago.TotalHours   -lt 24) { return "$([int]$ago.TotalHours)h ago"   }
+    "$([int]$ago.TotalDays)d ago"
+}
+
+function New-TrayIcon($ok) {
+    $bmp = New-Object System.Drawing.Bitmap(16, 16)
+    $g   = [System.Drawing.Graphics]::FromImage($bmp)
+    $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
+    $g.FillEllipse(
+        $(if ($ok) { [System.Drawing.Brushes]::ForestGreen } else { [System.Drawing.Brushes]::Crimson }),
+        1, 1, 13, 13)
+    $pen = New-Object System.Drawing.Pen([System.Drawing.Color]::White, 2)
+    if ($ok) {
+        $g.DrawLines($pen, [System.Drawing.Point[]]@(
+            [System.Drawing.Point]::new(3,  8),
+            [System.Drawing.Point]::new(6, 11),
+            [System.Drawing.Point]::new(12, 4)))
+    } else {
+        $g.DrawLine($pen,  4,  4, 11, 11)
+        $g.DrawLine($pen, 11,  4,  4, 11)
+    }
+    $pen.Dispose(); $g.Dispose()
+    $icon = [System.Drawing.Icon]::FromHandle($bmp.GetHicon())
+    $bmp.Dispose(); $icon
 }
 
 function Invoke-Restore($repo, $snapId) {
@@ -38,62 +75,17 @@ function Invoke-Restore($repo, $snapId) {
     if (Test-Path $target) { Start-Process explorer.exe $target }
 }
 
-function Add-SnapshotRows($panel, $repo) {
-    $snaps = Get-Snapshots $repo
-    if ($snaps.Count -eq 0) {
-        $lbl          = New-Object System.Windows.Forms.Label
-        $lbl.Text     = '  No snapshots found.'
-        $lbl.ForeColor = [System.Drawing.Color]::Gray
-        $lbl.AutoSize = $true
-        $panel.Controls.Add($lbl)
-        return
-    }
-    foreach ($snap in ($snaps | Sort-Object time -Descending)) {
-        $row              = New-Object System.Windows.Forms.FlowLayoutPanel
-        $row.FlowDirection = 'LeftToRight'
-        $row.AutoSize     = $true
-        $row.Margin       = '0,0,0,3'
-
-        $lblId           = New-Object System.Windows.Forms.Label
-        $lblId.Text      = $snap.short_id
-        $lblId.Width     = 80
-        $lblId.TextAlign = 'MiddleLeft'
-
-        $dt              = try { [DateTime]::Parse($snap.time).ToLocalTime().ToString('yyyy-MM-dd  HH:mm') } catch { $snap.time }
-        $lblDate         = New-Object System.Windows.Forms.Label
-        $lblDate.Text    = $dt
-        $lblDate.Width   = 160
-        $lblDate.TextAlign = 'MiddleLeft'
-
-        $btn         = New-Object System.Windows.Forms.Button
-        $btn.Text    = 'Restore Snapshot'
-        $btn.AutoSize = $true
-
-        $snapId  = $snap.short_id
-        $repoRef = $repo
-        $btn.Add_Click({
-            $btn.Enabled = $false
-            $btn.Text    = 'Restoring...'
-            $form.Refresh()
-            Invoke-Restore $repoRef $snapId
-            $btn.Text = "Restored $([char]0x2713)"
-        }.GetNewClosure())
-
-        $row.Controls.Add($lblId)
-        $row.Controls.Add($lblDate)
-        $row.Controls.Add($btn)
-        $panel.Controls.Add($row)
-    }
-}
-
-$form                  = New-Object System.Windows.Forms.Form
-$form.Text             = 'ResticPSD - Restore Snapshots'
-$form.AutoSize         = $true
-$form.AutoSizeMode     = 'GrowAndShrink'
-$form.StartPosition    = 'CenterScreen'
-$form.FormBorderStyle  = 'FixedDialog'
-$form.MaximizeBox      = $false
-$form.Font             = New-Object System.Drawing.Font($MainFont, 9)
+# --- Main form (hidden until tray click) ---
+$form                 = New-Object System.Windows.Forms.Form
+$form.Text            = 'ResticPSD'
+$form.AutoSize        = $true
+$form.AutoSizeMode    = 'GrowAndShrink'
+$form.StartPosition   = 'CenterScreen'
+$form.FormBorderStyle = 'FixedDialog'
+$form.MaximizeBox     = $false
+$form.ShowInTaskbar   = $false
+$form.Font            = New-Object System.Drawing.Font($MainFont, 9)
+$form.Add_FormClosing({ $_.Cancel = $true; $form.Hide() })
 
 $root               = New-Object System.Windows.Forms.FlowLayoutPanel
 $root.FlowDirection = 'TopDown'
@@ -103,20 +95,214 @@ $root.Dock          = 'Fill'
 $root.Padding       = New-Object System.Windows.Forms.Padding(15)
 $form.Controls.Add($root)
 
-foreach ($section in @(
-    @{ Label = 'Bihourly'; Repo = $RepoBihourly; Margin = '0,0,0,5'  },
-    @{ Label = 'Daily';    Repo = $RepoDaily;    Margin = '0,12,0,5' }
-)) {
-    $lbl           = New-Object System.Windows.Forms.Label
-    $lbl.Text      = $section.Label
-    $lbl.Font      = New-Object System.Drawing.Font($MainFont, 11, [System.Drawing.FontStyle]::Bold)
-    $lbl.AutoSize  = $true
-    $lbl.Margin    = $section.Margin
+# Status section
+$lblStatusHeader          = New-Object System.Windows.Forms.Label
+$lblStatusHeader.Text     = 'BACKUP STATUS'
+$lblStatusHeader.Font     = New-Object System.Drawing.Font($MainFont, 9, [System.Drawing.FontStyle]::Bold)
+$lblStatusHeader.AutoSize = $true
+$lblStatusHeader.Margin   = '0,0,0,4'
+$root.Controls.Add($lblStatusHeader)
+
+$statusLabels = @{}
+foreach ($s in @('bihourly', 'daily')) {
+    $lbl          = New-Object System.Windows.Forms.Label
+    $lbl.AutoSize = $true
+    $lbl.Margin   = '0,0,0,2'
     $root.Controls.Add($lbl)
-    Add-SnapshotRows $root $section.Repo
+    $statusLabels[$s] = $lbl
 }
 
-$form.ShowDialog() | Out-Null
+$btnRefresh          = New-Object System.Windows.Forms.Button
+$btnRefresh.Text     = 'Refresh'
+$btnRefresh.AutoSize = $true
+$btnRefresh.Margin   = '0,8,0,12'
+$root.Controls.Add($btnRefresh)
+
+# Snapshot sections
+$snapshotPanels = @{}
+foreach ($s in @(
+    @{ Key = 'bihourly'; Label = 'SNAPSHOTS - BIHOURLY'; Repo = $RepoBihourly },
+    @{ Key = 'daily';    Label = 'SNAPSHOTS - DAILY';    Repo = $RepoDaily    }
+)) {
+    $hdr          = New-Object System.Windows.Forms.Label
+    $hdr.Text     = $s.Label
+    $hdr.Font     = New-Object System.Drawing.Font($MainFont, 9, [System.Drawing.FontStyle]::Bold)
+    $hdr.AutoSize = $true
+    $hdr.Margin   = '0,4,0,4'
+    $root.Controls.Add($hdr)
+
+    $panel               = New-Object System.Windows.Forms.FlowLayoutPanel
+    $panel.FlowDirection = 'TopDown'
+    $panel.WrapContents  = $false
+    $panel.AutoSize      = $true
+    $root.Controls.Add($panel)
+    $snapshotPanels[$s.Key] = @{ Panel = $panel; Repo = $s.Repo }
+}
+
+function Refresh-All {
+    # Status labels + tray icon
+    $tB   = Get-LastSnapshotTime $RepoBihourly
+    $tD   = Get-LastSnapshotTime $RepoDaily
+    $okB  = $tB -and ([DateTime]::UtcNow - $tB.ToUniversalTime()).TotalMinutes -lt 30
+    $okD  = $tD -and ([DateTime]::UtcNow - $tD.ToUniversalTime()).TotalHours   -lt 24
+
+    foreach ($s in @(
+        @{ Key = 'bihourly'; Ok = $okB; Time = $tB; Label = 'Bihourly' },
+        @{ Key = 'daily';    Ok = $okD; Time = $tD; Label = 'Daily'    }
+    )) {
+        $lbl           = $statusLabels[$s.Key]
+        $lbl.Text      = "  $(if ($s.Ok) { 'OK' } else { 'FAIL' })  $($s.Label)  -  $(Format-TimeAgo $s.Time)"
+        $lbl.ForeColor = if ($s.Ok) { [System.Drawing.Color]::Green } else { [System.Drawing.Color]::Crimson }
+    }
+
+    $old = $notifyIcon.Icon
+    $notifyIcon.Icon = New-TrayIcon ($okB -and $okD)
+    if ($old) { $old.Dispose() }
+    $notifyIcon.Text = "Bihourly: $(Format-TimeAgo $tB)  |  Daily: $(Format-TimeAgo $tD)"
+
+    # Snapshot rows
+    foreach ($key in $snapshotPanels.Keys) {
+        $entry = $snapshotPanels[$key]
+        $entry.Panel.Controls.Clear()
+        $snaps = Get-Snapshots $entry.Repo
+        if ($snaps.Count -eq 0) {
+            $lbl           = New-Object System.Windows.Forms.Label
+            $lbl.Text      = '  No snapshots found.'
+            $lbl.ForeColor = [System.Drawing.Color]::Gray
+            $lbl.AutoSize  = $true
+            $entry.Panel.Controls.Add($lbl)
+        } else {
+            foreach ($snap in ($snaps | Sort-Object time -Descending)) {
+                $row               = New-Object System.Windows.Forms.FlowLayoutPanel
+                $row.FlowDirection = 'LeftToRight'
+                $row.AutoSize      = $true
+                $row.Margin        = '0,0,0,3'
+
+                $lblId             = New-Object System.Windows.Forms.Label
+                $lblId.Text        = $snap.short_id
+                $lblId.Width       = 80
+                $lblId.TextAlign   = 'MiddleLeft'
+
+                $dt                = try { [DateTime]::Parse($snap.time).ToLocalTime().ToString('yyyy-MM-dd  HH:mm') } catch { $snap.time }
+                $lblDate           = New-Object System.Windows.Forms.Label
+                $lblDate.Text      = $dt
+                $lblDate.Width     = 160
+                $lblDate.TextAlign = 'MiddleLeft'
+
+                $btn          = New-Object System.Windows.Forms.Button
+                $btn.Text     = 'Restore Snapshot'
+                $btn.AutoSize = $true
+
+                $snapId  = $snap.short_id
+                $repoRef = $entry.Repo
+                $btn.Add_Click({
+                    Invoke-Restore $repoRef $snapId
+                }.GetNewClosure())
+
+                $row.Controls.Add($lblId)
+                $row.Controls.Add($lblDate)
+                $row.Controls.Add($btn)
+                $entry.Panel.Controls.Add($row)
+            }
+        }
+    }
+    $form.Refresh()
+}
+
+$btnRefresh.Add_Click({ Refresh-All })
+
+# --- Tray ---
+$notifyIcon         = New-Object System.Windows.Forms.NotifyIcon
+$notifyIcon.Icon    = New-TrayIcon $false
+$notifyIcon.Text    = 'ResticPSD'
+$notifyIcon.Visible = $true
+$notifyIcon.Add_MouseClick({
+    if ($_.Button -eq [System.Windows.Forms.MouseButtons]::Left) {
+        if ($form.Visible) { $form.Hide() } else { $form.Show(); $form.BringToFront() }
+    }
+})
+
+$ctx        = New-Object System.Windows.Forms.ContextMenuStrip
+$mnuOpen    = New-Object System.Windows.Forms.ToolStripMenuItem 'Open Control Panel'
+$mnuOpen.Add_Click({ $form.Show(); $form.BringToFront() })
+$mnuExit    = New-Object System.Windows.Forms.ToolStripMenuItem 'Exit'
+$mnuExit.Add_Click({
+    $timer.Stop()
+    $notifyIcon.Visible = $false
+    $notifyIcon.Dispose()
+    [System.Windows.Forms.Application]::Exit()
+})
+$ctx.Items.Add($mnuOpen) | Out-Null
+$ctx.Items.Add($mnuExit) | Out-Null
+$notifyIcon.ContextMenuStrip = $ctx
+
+# --- Timer: refresh every 5 minutes ---
+$timer          = New-Object System.Windows.Forms.Timer
+$timer.Interval = 300000
+$timer.Add_Tick({ Refresh-All })
+$timer.Start()
+
+Refresh-All
+[System.Windows.Forms.Application]::Run()
+'@
+
+# ---------------------------------------------------------------------------
+# ResticPSD_CheckIntegrity.ps1 template - standalone integrity check
+# ---------------------------------------------------------------------------
+$IntegrityCheckTemplate = @'
+$InstallPath  = '__INSTALL_PATH__'
+$RepoBihourly = '__REPO_BIHOURLY__'
+$RepoDaily    = '__REPO_DAILY__'
+$PwFile       = "$InstallPath\restic_password"
+
+function Check-Repo($name, $repo, $thresholdMinutes) {
+    Write-Host "`n=== $name ===" -ForegroundColor Cyan
+
+    if (-not (Test-Path $repo)) {
+        Write-Host '  FAIL  Repo not found.' -ForegroundColor Red
+        return
+    }
+
+    # Last snapshot time
+    $json = & restic snapshots --json -r $repo --password-file $PwFile 2>$null
+    $lastTime = $null
+    try {
+        $snaps = $json | ConvertFrom-Json
+        if ($snaps -and $snaps.Count -gt 0) {
+            $lastTime = [DateTime]::Parse(($snaps | Select-Object -Last 1).time)
+        }
+    } catch {}
+
+    if ($null -eq $lastTime) {
+        Write-Host '  FAIL  No snapshots found.' -ForegroundColor Red
+    } else {
+        $ago    = [DateTime]::UtcNow - $lastTime.ToUniversalTime()
+        $agoStr = if ($ago.TotalMinutes -lt 60)  { "$([int]$ago.TotalMinutes)m ago" }
+                  elseif ($ago.TotalHours -lt 24) { "$([int]$ago.TotalHours)h ago"  }
+                  else                            { "$([int]$ago.TotalDays)d ago"   }
+        $local  = $lastTime.ToLocalTime().ToString('yyyy-MM-dd HH:mm')
+        if ($ago.TotalMinutes -lt $thresholdMinutes) {
+            Write-Host "  OK    Last snapshot: $agoStr  ($local)" -ForegroundColor Green
+        } else {
+            Write-Host "  WARN  Last snapshot: $agoStr - overdue!  ($local)" -ForegroundColor Yellow
+        }
+    }
+
+    # Structural integrity
+    Write-Host '  Checking repo structure...' -ForegroundColor Gray
+    & restic check -r $repo --password-file $PwFile 2>&1 | Out-Null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host '  OK    Repository structure intact.' -ForegroundColor Green
+    } else {
+        Write-Host '  FAIL  Repository errors detected. Run restic check manually for details.' -ForegroundColor Red
+    }
+}
+
+Check-Repo 'Bihourly' $RepoBihourly 30
+Check-Repo 'Daily'    $RepoDaily    1440
+
+Write-Host ''
+Pause
 '@
 
 # ---------------------------------------------------------------------------
@@ -124,10 +310,10 @@ $form.ShowDialog() | Out-Null
 # ---------------------------------------------------------------------------
 function Set-CheckStep($labels, $key, $state) {
     $icon  = switch ($state) {
-        'pending' { [char]0x25CB }   # ○
-        'running' { [char]0x25BA }   # ►
-        'done'    { [char]0x2713 }   # ✓
-        'error'   { [char]0x2717 }   # ✗
+        'pending' { '[ ]' }
+        'running' { '[>]' }
+        'done'    { '[OK]' }
+        'error'   { '[X]' }
     }
     $color = switch ($state) {
         'pending' { [System.Drawing.Color]::Silver }
@@ -144,22 +330,38 @@ function Set-CheckStep($labels, $key, $state) {
 # Uninstall-ResticPSD
 # ---------------------------------------------------------------------------
 function Uninstall-ResticPSD($installPath) {
-    Get-ScheduledTask | Where-Object { $_.TaskName -like 'ResticPSD_*' } |
-        ForEach-Object { Unregister-ScheduledTask -TaskName $_.TaskName -Confirm:$false }
+    # 1. Kill ControlPanel tray process first so file handles are released
+    foreach ($proc in (Get-CimInstance Win32_Process -Filter "Name='powershell.exe' OR Name='pwsh.exe'" -ErrorAction SilentlyContinue)) {
+        if ($proc.CommandLine -like '*ResticPSD_ControlPanel*') {
+            Stop-Process -Id $proc.ProcessId -Force -ErrorAction SilentlyContinue
+        }
+    }
+    Start-Sleep -Milliseconds 600
 
-    if (Test-Path $installPath)                     { Remove-Item $installPath -Recurse -Force }
+    # 2. Unregister all ResticPSD scheduled tasks
+    Get-ScheduledTask | Where-Object { $_.TaskName -like 'ResticPSD_*' } |
+        ForEach-Object { Unregister-ScheduledTask -TaskName $_.TaskName -Confirm:$false -ErrorAction SilentlyContinue }
+
+    # 3. Remove install directory
+    if (Test-Path $installPath) { Remove-Item $installPath -Recurse -Force }
+
+    # 4. Remove restic from System32
     if (Test-Path 'C:\Windows\System32\restic.exe') { Remove-Item 'C:\Windows\System32\restic.exe' -Force }
 
-    foreach ($lnk in @(
-        "C:\Users\$env:USERNAME\Desktop\ResticPSD - Restore to Desktop.lnk",
-        "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\ResticPSD - Restore to Desktop.lnk"
-    )) { if (Test-Path $lnk) { Remove-Item $lnk -Force } }
+    # 5. Remove shortcuts from Desktop and Start Menu
+    foreach ($dir in @(
+        "$env:USERPROFILE\Desktop",
+        "$env:APPDATA\Microsoft\Windows\Start Menu\Programs"
+    )) {
+        Get-ChildItem -Path $dir -Filter 'ResticPSD*.lnk' -ErrorAction SilentlyContinue |
+            Remove-Item -Force -ErrorAction SilentlyContinue
+    }
 }
 
 # ---------------------------------------------------------------------------
 # Install-ResticPSD
 # ---------------------------------------------------------------------------
-function Install-ResticPSD($cfg, $stepLabels, $shortcuts) {
+function Install-ResticPSD($cfg, $stepLabels) {
 
     # 1. Uninstall previous
     Set-CheckStep $stepLabels 'uninstall' 'running'
@@ -228,11 +430,16 @@ function Install-ResticPSD($cfg, $stepLabels, $shortcuts) {
     New-RestoreBat 'REPO_DAILY' 'daily' |
         Set-Content "$($cfg.InstallPath)\RestoreToDesktop_daily.bat"
 
-    $RestoreGuiTemplate `
-        -replace '__INSTALL_PATH__',  $cfg.InstallPath `
-        -replace '__REPO_BIHOURLY__', $cfg.RepoBihourly `
-        -replace '__REPO_DAILY__',    $cfg.RepoDaily |
-        Set-Content "$($cfg.InstallPath)\ResticPSD_Restore.ps1" -Encoding UTF8
+    foreach ($tmpl in @(
+        @{ Template = $ControlPanelTemplate;   File = 'ResticPSD_ControlPanel.ps1'    },
+        @{ Template = $IntegrityCheckTemplate; File = 'ResticPSD_CheckIntegrity.ps1'  }
+    )) {
+        $tmpl.Template `
+            -replace '__INSTALL_PATH__',  $cfg.InstallPath `
+            -replace '__REPO_BIHOURLY__', $cfg.RepoBihourly `
+            -replace '__REPO_DAILY__',    $cfg.RepoDaily |
+            Set-Content "$($cfg.InstallPath)\$($tmpl.File)" -Encoding UTF8
+    }
 
     Copy-Item "$($cfg.InstallPath)\restic_0.16.3_windows_amd64.exe" 'C:\Windows\System32\restic.exe' -Force
     Set-CheckStep $stepLabels 'scripts' 'done'
@@ -256,9 +463,17 @@ function Install-ResticPSD($cfg, $stepLabels, $shortcuts) {
     $action  = New-ScheduledTaskAction -Execute "$($cfg.InstallPath)\ResticPSD_daily.bat"
     $trigger = New-ScheduledTaskTrigger -Daily -At '9:00 PM'
     Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'ResticPSD_daily' -User $env:USERNAME | Out-Null
+
+    $action   = New-ScheduledTaskAction -Execute 'powershell.exe' `
+        -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$($cfg.InstallPath)\ResticPSD_ControlPanel.ps1`""
+    $trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+    $settings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -ExecutionTimeLimit ([TimeSpan]::Zero)
+    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'ResticPSD_integrity' `
+        -Settings $settings -User $env:USERNAME -RunLevel Highest | Out-Null
+    Start-ScheduledTask -TaskName 'ResticPSD_integrity' -ErrorAction SilentlyContinue
     Set-CheckStep $stepLabels 'tasks' 'done'
 
-    # 6. Run first backup session (blocking — wait for both to finish)
+    # 6. Run first backup session (blocking - wait for both to finish)
     Set-CheckStep $stepLabels 'backup' 'running'
     Start-Process -FilePath "$($cfg.InstallPath)\ResticPSD_bihourly.bat" -Wait -NoNewWindow
     Start-Process -FilePath "$($cfg.InstallPath)\ResticPSD_daily.bat"    -Wait -NoNewWindow
@@ -271,7 +486,7 @@ function Install-ResticPSD($cfg, $stepLabels, $shortcuts) {
 # ---------------------------------------------------------------------------
 function Get-TaskStatus($taskName) {
     $task = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
-    if ($task) { return [char]0x2713 } else { return [char]0x2717 }
+    if ($task) { return 'OK' } else { return 'X' }
 }
 
 # ---------------------------------------------------------------------------
@@ -311,7 +526,7 @@ foreach ($name in $TaskNames) {
     $lbl.Margin    = '0,0,0,2'
     $status        = Get-TaskStatus $name
     $lbl.Text      = "  $status   $name"
-    $lbl.ForeColor = if ($status -eq [char]0x2713) { 'Green' } else { 'Red' }
+    $lbl.ForeColor = if ($status -eq 'OK') { 'Green' } else { 'Red' }
     $root.Controls.Add($lbl)
     $taskLabels[$name] = $lbl
 }
@@ -409,32 +624,6 @@ $rowBackupRoot.Controls.Add($btnBackupRoot)
 $root.Controls.Add($rowBackupRoot)
 $root.Controls.Add($lblBackupHint)
 
-# --- Shortcut placement checkboxes ---
-$lblShortcuts          = New-Object System.Windows.Forms.Label
-$lblShortcuts.Text     = 'Place "Restore to Desktop" shortcut in:'
-$lblShortcuts.AutoSize = $true
-$lblShortcuts.Margin   = '0,12,0,4'
-$root.Controls.Add($lblShortcuts)
-
-$rowShortcuts          = New-Object System.Windows.Forms.FlowLayoutPanel
-$rowShortcuts.AutoSize = $true
-$rowShortcuts.Margin   = '0,0,0,0'
-
-$chkDesktop           = New-Object System.Windows.Forms.CheckBox
-$chkDesktop.Text      = 'Desktop'
-$chkDesktop.Checked   = $true
-$chkDesktop.AutoSize  = $true
-$chkDesktop.Margin    = '0,0,14,0'
-
-$chkStartMenu         = New-Object System.Windows.Forms.CheckBox
-$chkStartMenu.Text    = 'Start Menu'
-$chkStartMenu.Checked = $true
-$chkStartMenu.AutoSize = $true
-$chkStartMenu.Margin  = '0,0,0,0'
-
-$rowShortcuts.Controls.Add($chkDesktop)
-$rowShortcuts.Controls.Add($chkStartMenu)
-$root.Controls.Add($rowShortcuts)
 
 # --- Install checklist ---
 $lblChecklist          = New-Object System.Windows.Forms.Label
@@ -450,14 +639,13 @@ $stepDefs = @(
     @{ Key = 'repos';     Text = 'Initialize backup repositories' }
     @{ Key = 'tasks';     Text = 'Schedule backup tasks' }
     @{ Key = 'backup';    Text = 'Run first backup session' }
-    @{ Key = 'shortcuts'; Text = 'Create shortcuts' }
 )
 
 $stepLabels = @{}
 foreach ($step in $stepDefs) {
     $lbl           = New-Object System.Windows.Forms.Label
     $lbl.Tag       = $step.Text
-    $lbl.Text      = "  $([char]0x25CB)  $($step.Text)"
+    $lbl.Text      = "  [ ]  $($step.Text)"
     $lbl.AutoSize  = $true
     $lbl.ForeColor = [System.Drawing.Color]::Silver
     $lbl.Margin    = '0,0,0,1'
@@ -513,14 +701,11 @@ $btnRemove.Add_Click({
 })
 
 $btnInstall.Add_Click({
-    # Validate folders before doing anything
+    # Validate watched folders
     $missing = @()
     foreach ($f in $lstFolders.Items) {
         if (-not (Test-Path $f)) { $missing += "Watched folder:  $f" }
     }
-    $backupRoot = $txtBackupRoot.Text.TrimEnd('\')
-    if (-not (Test-Path $backupRoot)) { $missing += "Backup folder:   $backupRoot" }
-
     if ($missing.Count -gt 0) {
         [System.Windows.Forms.MessageBox]::Show(
             "The following folders do not exist:`n`n" + ($missing -join "`n"),
@@ -529,6 +714,29 @@ $btnInstall.Add_Click({
             [System.Windows.Forms.MessageBoxIcon]::Error
         ) | Out-Null
         return
+    }
+
+    # Validate backup root folder
+    $backupRoot = $txtBackupRoot.Text.TrimEnd('\')
+    $drive      = [System.IO.Path]::GetPathRoot($backupRoot)
+    if (-not (Test-Path $drive)) {
+        [System.Windows.Forms.MessageBox]::Show(
+            "Drive $drive does not exist.`nPlease choose a valid backup location.",
+            'Drive Not Found',
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Error
+        ) | Out-Null
+        return
+    }
+    if (-not (Test-Path $backupRoot)) {
+        $ans = [System.Windows.Forms.MessageBox]::Show(
+            "Backup folder does not exist:`n$backupRoot`n`nCreate it now?",
+            'Create Folder?',
+            [System.Windows.Forms.MessageBoxButtons]::YesNo,
+            [System.Windows.Forms.MessageBoxIcon]::Question
+        )
+        if ($ans -ne [System.Windows.Forms.DialogResult]::Yes) { return }
+        New-Item -ItemType Directory -Path $backupRoot -Force | Out-Null
     }
 
     $btnInstall.Enabled   = $false
@@ -545,27 +753,22 @@ $btnInstall.Add_Click({
         Folders      = @($lstFolders.Items)
         Keyword      = $txtKeyword.Text.Trim()
     }
-    $shortcuts = @{
-        Desktop   = $chkDesktop.Checked
-        StartMenu = $chkStartMenu.Checked
-    }
-
-    Install-ResticPSD $cfg $stepLabels $shortcuts
+    Install-ResticPSD $cfg $stepLabels
 
     foreach ($name in $TaskNames) {
         $status = Get-TaskStatus $name
         $taskLabels[$name].Text      = "  $status   $name"
-        $taskLabels[$name].ForeColor = if ($status -eq [char]0x2713) { 'Green' } else { 'Red' }
+        $taskLabels[$name].ForeColor = if ($status -eq 'OK') { 'Green' } else { 'Red' }
     }
 
     [System.Windows.Forms.MessageBox]::Show(
-        "Your files should now be automatically backed up.`nYou don't need to do anything more.",
+        "Your files are now being backed up automatically.`nClick the taskbar icon to restore snapshots.",
         'Setup Complete',
         [System.Windows.Forms.MessageBoxButtons]::OK,
         [System.Windows.Forms.MessageBoxIcon]::Information
     ) | Out-Null
 
-    $btnInstall.Text      = "Installed  $([char]0x2713)"
+    $btnInstall.Text      = "Installed"
     $btnInstall.Enabled   = $true
     $btnUninstall.Enabled = $true
 })
@@ -589,7 +792,7 @@ $btnUninstall.Add_Click({
     foreach ($name in $TaskNames) {
         $status = Get-TaskStatus $name
         $taskLabels[$name].Text      = "  $status   $name"
-        $taskLabels[$name].ForeColor = if ($status -eq [char]0x2713) { 'Green' } else { 'Red' }
+        $taskLabels[$name].ForeColor = if ($status -eq 'OK') { 'Green' } else { 'Red' }
     }
 
     [System.Windows.Forms.MessageBox]::Show(
