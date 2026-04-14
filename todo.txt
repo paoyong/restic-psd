@@ -1,3 +1,6 @@
-
 1. Create repository if it doesn't exist
 2. Make restore scripts able to restore snapshots.
+3. Make a taskbar icon where you can restore from snapshot (better than desktop shortcuts)
+	a. show file integrity
+	b. Show latest backup at time.
+4. Make it easy to uninstall.
