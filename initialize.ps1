@@ -1,4 +1,4 @@
-# initialize.ps1 - ResticPSD installer
+# initialize.ps1 - Acorn installer
 
 # --- Self-elevate to Administrator ---
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")) {
@@ -9,12 +9,12 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
 $ScriptDir   = Split-Path -Parent $MyInvocation.MyCommand.Path
-$InstallPath = "C:\Program Files\ResticPSD"
-$TaskNames   = @('ResticPSD_bihourly', 'ResticPSD_daily')
+$InstallPath = "C:\Program Files\Acorn"
+$TaskNames   = @('AcornBackup_bihourly', 'AcornBackup_daily')
 $MainFont    = "Segoe UI"
 
 # ---------------------------------------------------------------------------
-# ResticPSD_ControlPanel.ps1 template
+# AcornIntegrity.ps1 template
 # ---------------------------------------------------------------------------
 $ControlPanelTemplate = @'
 Add-Type -AssemblyName System.Windows.Forms
@@ -70,14 +70,14 @@ function New-TrayIcon($ok) {
 }
 
 function Invoke-Restore($repo, $snapId) {
-    $target = "$env:USERPROFILE\Desktop\restic_restore_$snapId"
+    $target = "$env:USERPROFILE\Desktop\acorn_restore_$snapId"
     & restic restore $snapId -r $repo --target $target --password-file $PwFile 2>$null
     if (Test-Path $target) { Start-Process explorer.exe $target }
 }
 
 # --- Main form (hidden until tray click) ---
 $form                 = New-Object System.Windows.Forms.Form
-$form.Text            = 'ResticPSD'
+$form.Text            = 'Acorn'
 $form.AutoSize        = $true
 $form.AutoSizeMode    = 'GrowAndShrink'
 $form.StartPosition   = 'CenterScreen'
@@ -214,7 +214,7 @@ $btnRefresh.Add_Click({ Refresh-All })
 # --- Tray ---
 $notifyIcon         = New-Object System.Windows.Forms.NotifyIcon
 $notifyIcon.Icon    = New-TrayIcon $false
-$notifyIcon.Text    = 'ResticPSD'
+$notifyIcon.Text    = 'Acorn'
 $notifyIcon.Visible = $true
 $notifyIcon.Add_MouseClick({
     if ($_.Button -eq [System.Windows.Forms.MouseButtons]::Left) {
@@ -247,7 +247,7 @@ Refresh-All
 '@
 
 # ---------------------------------------------------------------------------
-# ResticPSD_CheckIntegrity.ps1 template - standalone integrity check
+# AcornCheckIntegrity.ps1 template - standalone integrity check
 # ---------------------------------------------------------------------------
 $IntegrityCheckTemplate = @'
 $InstallPath  = '__INSTALL_PATH__'
@@ -327,19 +327,19 @@ function Set-CheckStep($labels, $key, $state) {
 }
 
 # ---------------------------------------------------------------------------
-# Uninstall-ResticPSD
+# Uninstall-Acorn
 # ---------------------------------------------------------------------------
-function Uninstall-ResticPSD($installPath) {
+function Uninstall-Acorn($installPath) {
     # 1. Kill ControlPanel tray process first so file handles are released
     foreach ($proc in (Get-CimInstance Win32_Process -Filter "Name='powershell.exe' OR Name='pwsh.exe'" -ErrorAction SilentlyContinue)) {
-        if ($proc.CommandLine -like '*ResticPSD_ControlPanel*') {
+        if ($proc.CommandLine -like '*AcornIntegrity*') {
             Stop-Process -Id $proc.ProcessId -Force -ErrorAction SilentlyContinue
         }
     }
     Start-Sleep -Milliseconds 600
 
-    # 2. Unregister all ResticPSD scheduled tasks
-    Get-ScheduledTask | Where-Object { $_.TaskName -like 'ResticPSD_*' } |
+    # 2. Unregister all Acorn scheduled tasks
+    Get-ScheduledTask | Where-Object { $_.TaskName -like 'Acorn*' } |
         ForEach-Object { Unregister-ScheduledTask -TaskName $_.TaskName -Confirm:$false -ErrorAction SilentlyContinue }
 
     # 3. Remove install directory
@@ -353,19 +353,19 @@ function Uninstall-ResticPSD($installPath) {
         "$env:USERPROFILE\Desktop",
         "$env:APPDATA\Microsoft\Windows\Start Menu\Programs"
     )) {
-        Get-ChildItem -Path $dir -Filter 'ResticPSD*.lnk' -ErrorAction SilentlyContinue |
+        Get-ChildItem -Path $dir -Filter 'Acorn*.lnk' -ErrorAction SilentlyContinue |
             Remove-Item -Force -ErrorAction SilentlyContinue
     }
 }
 
 # ---------------------------------------------------------------------------
-# Install-ResticPSD
+# Install-Acorn
 # ---------------------------------------------------------------------------
-function Install-ResticPSD($cfg, $stepLabels) {
+function Install-Acorn($cfg, $stepLabels) {
 
     # 1. Uninstall previous
     Set-CheckStep $stepLabels 'uninstall' 'running'
-    Uninstall-ResticPSD $cfg.InstallPath
+    Uninstall-Acorn $cfg.InstallPath
     Set-CheckStep $stepLabels 'uninstall' 'done'
 
     # 2. Copy files to install location
@@ -386,7 +386,7 @@ function Install-ResticPSD($cfg, $stepLabels) {
         $cfg.Folders
     }
     $folderEntries | Set-Content "$($cfg.InstallPath)\folders_watched.txt"
-    @('*.lnk', 'restic_restore') -join "`r`n" | Set-Content "$($cfg.InstallPath)\restic_exclude.txt"
+    @('*.lnk', 'acorn_restore') -join "`r`n" | Set-Content "$($cfg.InstallPath)\restic_exclude.txt"
     Set-CheckStep $stepLabels 'files' 'done'
 
     # 3. Generate backup scripts
@@ -407,7 +407,7 @@ function Install-ResticPSD($cfg, $stepLabels) {
         @(
             '@echo off',
             'call "%~dp0config.bat"',
-            "set TARGET=%USERPROFILE%\Desktop\restic_restore_$suffix",
+            "set TARGET=%USERPROFILE%\Desktop\acorn_restore_$suffix",
             "restic restore latest -r %$repoVar% --target `"%TARGET%`" --password-file `"%INSTALL_PATH%\restic_password`"",
             'echo.',
             'echo Restored to %TARGET%',
@@ -416,23 +416,23 @@ function Install-ResticPSD($cfg, $stepLabels) {
     }
 
     New-BackupBat 'REPO_BIHOURLY' |
-        Set-Content "$($cfg.InstallPath)\ResticPSD_bihourly.bat"
+        Set-Content "$($cfg.InstallPath)\AcornBackup_bihourly.bat"
 
     New-BackupBat 'REPO_DAILY' @(
         '',
         'restic -r %REPO_DAILY%    forget --keep-last %SNAPSHOTS_DAILY%    --prune --password-file="%INSTALL_PATH%\restic_password"',
         'restic -r %REPO_BIHOURLY% forget --keep-last %SNAPSHOTS_BIHOURLY% --prune --password-file="%INSTALL_PATH%\restic_password"'
-    ) | Set-Content "$($cfg.InstallPath)\ResticPSD_daily.bat"
+    ) | Set-Content "$($cfg.InstallPath)\AcornBackup_daily.bat"
 
     New-RestoreBat 'REPO_BIHOURLY' 'bihourly' |
-        Set-Content "$($cfg.InstallPath)\RestoreToDesktop_bihourly.bat"
+        Set-Content "$($cfg.InstallPath)\AcornRestore_bihourly.bat"
 
     New-RestoreBat 'REPO_DAILY' 'daily' |
-        Set-Content "$($cfg.InstallPath)\RestoreToDesktop_daily.bat"
+        Set-Content "$($cfg.InstallPath)\AcornRestore_daily.bat"
 
     foreach ($tmpl in @(
-        @{ Template = $ControlPanelTemplate;   File = 'ResticPSD_ControlPanel.ps1'    },
-        @{ Template = $IntegrityCheckTemplate; File = 'ResticPSD_CheckIntegrity.ps1'  }
+        @{ Template = $ControlPanelTemplate;   File = 'AcornIntegrity.ps1'    },
+        @{ Template = $IntegrityCheckTemplate; File = 'AcornCheckIntegrity.ps1'  }
     )) {
         $tmpl.Template `
             -replace '__INSTALL_PATH__',  $cfg.InstallPath `
@@ -455,30 +455,30 @@ function Install-ResticPSD($cfg, $stepLabels) {
 
     # 5. Schedule backup tasks
     Set-CheckStep $stepLabels 'tasks' 'running'
-    Get-ScheduledTask | Where-Object { $_.TaskName -like 'ResticPSD_*' } |
+    Get-ScheduledTask | Where-Object { $_.TaskName -like 'Acorn*' } |
         ForEach-Object { Unregister-ScheduledTask -TaskName $_.TaskName -Confirm:$false }
     $action  = New-ScheduledTaskAction -Execute 'powershell.exe' `
-        -Argument "-WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -Command `"& '$($cfg.InstallPath)\ResticPSD_bihourly.bat'`""
+        -Argument "-WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -Command `"& '$($cfg.InstallPath)\AcornBackup_bihourly.bat'`""
     $trigger = New-ScheduledTaskTrigger -At 12am -Once -RepetitionInterval ([TimeSpan]::FromMinutes(30))
-    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'ResticPSD_bihourly' -User $env:USERNAME | Out-Null
+    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'AcornBackup_bihourly' -User $env:USERNAME | Out-Null
     $action  = New-ScheduledTaskAction -Execute 'powershell.exe' `
-        -Argument "-WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -Command `"& '$($cfg.InstallPath)\ResticPSD_daily.bat'`""
+        -Argument "-WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass -Command `"& '$($cfg.InstallPath)\AcornBackup_daily.bat'`""
     $trigger = New-ScheduledTaskTrigger -Daily -At '9:00 PM'
-    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'ResticPSD_daily' -User $env:USERNAME | Out-Null
+    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'AcornBackup_daily' -User $env:USERNAME | Out-Null
 
     $action   = New-ScheduledTaskAction -Execute 'powershell.exe' `
-        -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$($cfg.InstallPath)\ResticPSD_ControlPanel.ps1`""
+        -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$($cfg.InstallPath)\AcornIntegrity.ps1`""
     $trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
     $settings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -ExecutionTimeLimit ([TimeSpan]::Zero)
-    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'ResticPSD_integrity' `
+    Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'AcornIntegrity' `
         -Settings $settings -User $env:USERNAME -RunLevel Highest | Out-Null
-    Start-ScheduledTask -TaskName 'ResticPSD_integrity' -ErrorAction SilentlyContinue
+    Start-ScheduledTask -TaskName 'AcornIntegrity' -ErrorAction SilentlyContinue
     Set-CheckStep $stepLabels 'tasks' 'done'
 
     # 6. Run first backup session (blocking - wait for both to finish)
     Set-CheckStep $stepLabels 'backup' 'running'
-    Start-Process -FilePath "$($cfg.InstallPath)\ResticPSD_bihourly.bat" -Wait -NoNewWindow
-    Start-Process -FilePath "$($cfg.InstallPath)\ResticPSD_daily.bat"    -Wait -NoNewWindow
+    Start-Process -FilePath "$($cfg.InstallPath)\AcornBackup_bihourly.bat" -Wait -NoNewWindow
+    Start-Process -FilePath "$($cfg.InstallPath)\AcornBackup_daily.bat"    -Wait -NoNewWindow
     Set-CheckStep $stepLabels 'backup' 'done'
 
 }
@@ -495,7 +495,7 @@ function Get-TaskStatus($taskName) {
 # UI
 # ---------------------------------------------------------------------------
 $form = New-Object System.Windows.Forms.Form
-$form.Text            = 'ResticPSD Setup'
+$form.Text            = 'Acorn Setup'
 $form.AutoSize        = $true
 $form.AutoSizeMode    = 'GrowAndShrink'
 $form.StartPosition   = 'CenterScreen'
@@ -755,7 +755,7 @@ $btnInstall.Add_Click({
         Folders      = @($lstFolders.Items)
         Keyword      = $txtKeyword.Text.Trim()
     }
-    Install-ResticPSD $cfg $stepLabels
+    Install-Acorn $cfg $stepLabels
 
     foreach ($name in $TaskNames) {
         $status = Get-TaskStatus $name
@@ -777,8 +777,8 @@ $btnInstall.Add_Click({
 
 $btnUninstall.Add_Click({
     $confirm = [System.Windows.Forms.MessageBox]::Show(
-        "This will remove all ResticPSD scheduled tasks and delete`n$InstallPath`n`nYour backup repos will NOT be deleted.`n`nContinue?",
-        'Uninstall ResticPSD',
+        "This will remove all Acorn scheduled tasks and delete`n$InstallPath`n`nYour backup repos will NOT be deleted.`n`nContinue?",
+        'Uninstall Acorn',
         [System.Windows.Forms.MessageBoxButtons]::YesNo,
         [System.Windows.Forms.MessageBoxIcon]::Warning
     )
@@ -789,7 +789,7 @@ $btnUninstall.Add_Click({
     $btnUninstall.Text    = 'Uninstalling...'
     $form.Refresh()
 
-    Uninstall-ResticPSD $InstallPath
+    Uninstall-Acorn $InstallPath
 
     foreach ($name in $TaskNames) {
         $status = Get-TaskStatus $name
@@ -798,7 +798,7 @@ $btnUninstall.Add_Click({
     }
 
     [System.Windows.Forms.MessageBox]::Show(
-        'ResticPSD has been uninstalled.',
+        'Acorn has been uninstalled.',
         'Uninstall Complete',
         [System.Windows.Forms.MessageBoxButtons]::OK,
         [System.Windows.Forms.MessageBoxIcon]::Information
