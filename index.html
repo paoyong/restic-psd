@@ -2,10 +2,19 @@
 <html>
 <head>
     <title>Acorn</title>
+    <link rel="icon" type="image/x-icon" href="logo/acorn_icon.ico">
+    <style>
+        body {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 16px;
+            font-family: Arial, sans-serif;
+        }
+    </style>
 </head>
 <body>
 
-    <h1>Acorn</h1>
+    <img src="logo/acorn_logo_text.png" alt="Acorn" style="max-width: 300px; width: 100%;">
 
     <p>
         Robust, immutable backup system for your working files.
@@ -20,8 +29,8 @@
 
     <h2>Robust</h2>
     <p>
-        This program essentially sets up two Windows Task Scheduler that runs generated backup script
-        every 30 minutes and daily. And gives you a GUI to run <code>restic restore</code> commands.
+        This program will set up Windows Task Scheduler that runs generated backup script
+        every 30 minutes and daily, and gives you a GUI to run <code>restic restore</code> commands.
     </p>
     <p>
         On top of that, this is an
@@ -31,15 +40,10 @@
     </p>
 
     <h2>Versioning</h2>
-    <p>Bihourly has 5 snapshots</p>
-    <p>Daily has 3 snapshots</p>
+    <p>Bihourly has 5 snapshots, and daily has 3 snapshots. That means the oldest backup it keeps is 3 days. Any backups past 3 days old will be deleted.</p>
+    <p></p>
+	<p>
 
-    <h2>Changing Settings</h2>
-    <p>
-        Got a new drive? Got a new folder you want to watch? New keyword?
-        Download the program, press the uninstall button, and reinstall!
-        All old repos will have to be manually deleted by you.
-    </p>
 
     <h2>Download</h2>
     <p>
@@ -51,8 +55,15 @@
     <h3>Installation</h3>
     <ol>
         <li>Unzip</li>
-        <li>Double click on Acorn.bat</li>
+        <li>Double click on <code>acorn_install.bat</code></li>
     </ol>
+    <h3>Changing Settings</h3>
+    <p>
+        This program was made to be immutable. That means from the time you install it, there is no changing of settings. 
+		If you want to watch a new folder or change anything, run <code>acorn_install.bat</code> again which will start anew.
+    </p>
+	<hr>
+	<p>Made by Pao Yong <a href="https://github.com/paoyong/restic-psd">GitHub</a></p>
 
 </body>
 </html>
