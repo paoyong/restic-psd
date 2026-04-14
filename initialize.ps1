@@ -83,42 +83,44 @@ function Install-ResticPSD($cfg, $stepLabels, $shortcuts) {
 
     # 3. Generate backup scripts
     Set-CheckStep $stepLabels 'scripts' 'running'
-    @(
-        '@echo off',
-        'call "%~dp0config.bat"',
-        '',
-        'restic backup --files-from="%INSTALL_PATH%\folders_watched.txt" -r %REPO_BIHOURLY% --exclude-file="%INSTALL_PATH%\restic_exclude.txt" --password-file="%INSTALL_PATH%\restic_password"'
-    ) -join "`r`n" | Set-Content "$($cfg.InstallPath)\ResticPSD_bihourly.bat"
-    @(
-        '@echo off',
-        'call "%~dp0config.bat"',
-        '',
-        'restic backup --files-from="%INSTALL_PATH%\folders_watched.txt" -r %REPO_DAILY% --exclude-file="%INSTALL_PATH%\restic_exclude.txt" --password-file="%INSTALL_PATH%\restic_password"',
+
+    function New-BackupBat($repoVar, $pruneLines) {
+        $lines = @(
+            '@echo off',
+            'call "%~dp0config.bat"',
+            '',
+            "restic backup --files-from=`"%INSTALL_PATH%\folders_watched.txt`" -r %$repoVar% --exclude-file=`"%INSTALL_PATH%\restic_exclude.txt`" --password-file=`"%INSTALL_PATH%\restic_password`""
+        )
+        if ($pruneLines) { $lines += $pruneLines }
+        $lines -join "`r`n"
+    }
+
+    function New-RestoreBat($repoVar, $suffix) {
+        @(
+            '@echo off',
+            'call "%~dp0config.bat"',
+            "set TARGET=%USERPROFILE%\Desktop\restic_restore_$suffix",
+            "restic restore latest -r %$repoVar% --target `"%TARGET%`" --password-file `"%INSTALL_PATH%\restic_password`"",
+            'echo.',
+            'echo Restored to %TARGET%',
+            'pause'
+        ) -join "`r`n"
+    }
+
+    New-BackupBat 'REPO_BIHOURLY' |
+        Set-Content "$($cfg.InstallPath)\ResticPSD_bihourly.bat"
+
+    New-BackupBat 'REPO_DAILY' @(
         '',
         'restic -r %REPO_DAILY%    forget --keep-last %SNAPSHOTS_DAILY%    --prune --password-file="%INSTALL_PATH%\restic_password"',
         'restic -r %REPO_BIHOURLY% forget --keep-last %SNAPSHOTS_BIHOURLY% --prune --password-file="%INSTALL_PATH%\restic_password"'
-    ) -join "`r`n" | Set-Content "$($cfg.InstallPath)\ResticPSD_daily.bat"
-    # RestoreToDesktop_bihourly.bat
-    @(
-        '@echo off',
-        'call "%~dp0config.bat"',
-        'set TARGET=%USERPROFILE%\Desktop\restic_restore_bihourly',
-        'restic restore latest -r %REPO_BIHOURLY% --target "%TARGET%" --password-file "%INSTALL_PATH%\restic_password"',
-        'echo.',
-        'echo Restored to %TARGET%',
-        'pause'
-    ) -join "`r`n" | Set-Content "$($cfg.InstallPath)\RestoreToDesktop_bihourly.bat"
+    ) | Set-Content "$($cfg.InstallPath)\ResticPSD_daily.bat"
 
-    # RestoreToDesktop_daily.bat
-    @(
-        '@echo off',
-        'call "%~dp0config.bat"',
-        'set TARGET=%USERPROFILE%\Desktop\restic_restore_daily',
-        'restic restore latest -r %REPO_DAILY% --target "%TARGET%" --password-file "%INSTALL_PATH%\restic_password"',
-        'echo.',
-        'echo Restored to %TARGET%',
-        'pause'
-    ) -join "`r`n" | Set-Content "$($cfg.InstallPath)\RestoreToDesktop_daily.bat"
+    New-RestoreBat 'REPO_BIHOURLY' 'bihourly' |
+        Set-Content "$($cfg.InstallPath)\RestoreToDesktop_bihourly.bat"
+
+    New-RestoreBat 'REPO_DAILY' 'daily' |
+        Set-Content "$($cfg.InstallPath)\RestoreToDesktop_daily.bat"
 
     Copy-Item "$($cfg.InstallPath)\restic_0.16.3_windows_amd64.exe" 'C:\Windows\System32\restic.exe' -Force
     Set-CheckStep $stepLabels 'scripts' 'done'
@@ -399,6 +401,24 @@ $btnRemove.Add_Click({
 })
 
 $btnInstall.Add_Click({
+    # Validate folders before doing anything
+    $missing = @()
+    foreach ($f in $lstFolders.Items) {
+        if (-not (Test-Path $f)) { $missing += "Watched folder:  $f" }
+    }
+    $backupRoot = $txtBackupRoot.Text.TrimEnd('\')
+    if (-not (Test-Path $backupRoot)) { $missing += "Backup folder:   $backupRoot" }
+
+    if ($missing.Count -gt 0) {
+        [System.Windows.Forms.MessageBox]::Show(
+            "The following folders do not exist:`n`n" + ($missing -join "`n"),
+            'Invalid Folders',
+            [System.Windows.Forms.MessageBoxButtons]::OK,
+            [System.Windows.Forms.MessageBoxIcon]::Error
+        ) | Out-Null
+        return
+    }
+
     $btnInstall.Enabled   = $false
     $btnUninstall.Enabled = $false
     $btnInstall.Text      = 'Installing...'
@@ -406,7 +426,6 @@ $btnInstall.Add_Click({
     # Reset checklist to pending
     foreach ($step in $stepDefs) { Set-CheckStep $stepLabels $step.Key 'pending' }
 
-    $backupRoot  = $txtBackupRoot.Text.TrimEnd('\')
     $cfg = @{
         InstallPath  = $InstallPath
         RepoBihourly = "$backupRoot\bihourly_backups"
