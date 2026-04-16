@@ -1,0 +1,27 @@
+{
+  "folders_watched": [
+    "C:/Users/$USERNAME$/Desktop"
+  ],
+  "watched_regex": [
+    "*WORKING*"
+  ],
+  "excluded_regex": [
+    ".*\.tmp$",
+    ".*\.log$",
+    ".*Thumbs\.db$",
+    ".*\.DS_Store$",
+    ".*\$RECYCLE\.BIN.*"
+  ],
+  "backups": [
+    {
+      "interval_hours": 1,
+      "snapshot_count": 3,
+      "repo_folder": "D:/backups/acorn_1h_backups"
+    },
+    {
+      "interval_hours": 24,
+      "snapshot_count": 5,
+      "repo_folder": "D:/backups/acorn_24h_backups"
+    }
+  ]
+}

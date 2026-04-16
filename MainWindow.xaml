@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="acorn.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:acorn"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Acorn Backup">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+
+    <NavigationView
+        x:Name="NavView"
+        PaneTitle="Acorn"
+        IsBackButtonVisible="Collapsed"
+        PaneDisplayMode="Left"
+        IsSettingsVisible="False"
+        SelectionChanged="NavView_SelectionChanged"
+        Loaded="NavView_Loaded">
+
+        <NavigationView.MenuItems>
+            <NavigationViewItem Tag="Backups" Content="Backups">
+                <NavigationViewItem.Icon>
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE753;" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem Tag="Status" Content="Status">
+                <NavigationViewItem.Icon>
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE9F9;" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+            <NavigationViewItem Tag="Restore" Content="Restore">
+                <NavigationViewItem.Icon>
+                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE777;" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.MenuItems>
+
+        <Frame x:Name="ContentFrame" />
+
+    </NavigationView>
+</Window>

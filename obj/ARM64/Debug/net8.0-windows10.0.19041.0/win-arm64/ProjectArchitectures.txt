@@ -1,0 +1,1 @@
+C:\Users\pao\Desktop\acorn\acorn.csproj;arm64

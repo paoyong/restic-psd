@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="acorn.Pages.BackupsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Transparent">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="36,28,36,36" Spacing="20" MaxWidth="800">
+
+            <!-- ── Page header ── -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Backups" Style="{StaticResource TitleTextBlockStyle}" />
+                    <TextBlock x:ConnectionId='25' x:Name="ConfigPathText"
+                               Opacity="0.5"
+                               Style="{StaticResource CaptionTextBlockStyle}"
+                               Margin="0,2,0,0" />
+                </StackPanel>
+                <ToggleSwitch x:ConnectionId='24' x:Name="MasterToggle"
+                              Grid.Column="1"
+                              VerticalAlignment="Center"
+                              OnContent="Enabled"
+                              OffContent="Disabled" />
+            </Grid>
+
+            <!-- ── Save feedback ── -->
+            <InfoBar x:ConnectionId='2' x:Name="SaveBar"
+                     IsOpen="False"
+                     IsClosable="True"
+                     Severity="Success"
+                     Title="Settings saved"
+                     Message="Config written and scheduled tasks updated." />
+
+            <!-- ── Watched Folders ── -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="Watched Folders"
+                           Style="{StaticResource SubtitleTextBlockStyle}" />
+                <TextBlock Text="Acorn monitors these folders for matching files."
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Opacity="0.6" />
+
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="8" Padding="16"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1">
+                    <StackPanel Spacing="8">
+                        <ListView x:ConnectionId='20' x:Name="FoldersList"
+                                  SelectionMode="Single"
+                                  MaxHeight="180"
+                                  MinHeight="48">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"
+                                               TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button x:ConnectionId='21' Content="Add Folder"                         />
+                            <Button x:ConnectionId='22' Content="Remove Selected"                            />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ── Include Patterns ── -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="Include Patterns (Keywords)"
+                           Style="{StaticResource SubtitleTextBlockStyle}" />
+                <TextBlock Text="Only files whose names match at least one pattern are backed up. Wildcards supported (e.g. *WORKING*)."
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Opacity="0.6"
+                           TextWrapping="Wrap" />
+
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="8" Padding="16"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1">
+                    <StackPanel Spacing="8">
+                        <ListView x:ConnectionId='15' x:Name="IncludeList"
+                                  SelectionMode="Single"
+                                  MaxHeight="140"
+                                  MinHeight="48">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"
+                                               FontFamily="Consolas"
+                                               VerticalAlignment="Center" />
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:ConnectionId='16' x:Name="NewIncludeBox"
+                                     PlaceholderText="e.g. *WORKING*"
+                                                                     />
+                            <Button x:ConnectionId='17' Grid.Column="1" Content="Add"                          />
+                            <Button x:ConnectionId='18' Grid.Column="2" Content="Remove Selected"                             />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ── Backup Schedules ── -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="Backup Schedules"
+                           Style="{StaticResource SubtitleTextBlockStyle}" />
+                <TextBlock Text="Each schedule creates its own restic repository and Task Scheduler entry."
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Opacity="0.6"
+                           TextWrapping="Wrap" />
+
+                <!-- 30-minute card -->
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="8" Padding="16"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1">
+                    <StackPanel Spacing="12">
+                        <ToggleSwitch x:ConnectionId='11' x:Name="Toggle30Min"
+                                      Header="Every 30 minutes" />
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:ConnectionId='12' x:Name="Repo30Min"
+                                     Header="Repository folder"
+                                     PlaceholderText="D:\Backups\acorn_30min" />
+                            <Button x:ConnectionId='13' Grid.Column="1"
+                                    Content="Browse"
+                                    VerticalAlignment="Bottom"
+                                                                  />
+                            <NumberBox x:ConnectionId='14' Grid.Column="2"
+                                       x:Name="Count30Min"
+                                       Header="Keep snapshots"
+                                       Minimum="1" Maximum="999"
+                                       SpinButtonPlacementMode="Compact"
+                                       Width="130" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Daily card -->
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="8" Padding="16"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1">
+                    <StackPanel Spacing="12">
+                        <ToggleSwitch x:ConnectionId='6' x:Name="ToggleDaily"
+                                      Header="Daily" />
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:ConnectionId='7' x:Name="RepoDaily"
+                                     Header="Repository folder"
+                                     PlaceholderText="D:\Backups\acorn_daily" />
+                            <Button x:ConnectionId='8' Grid.Column="1"
+                                    Content="Browse"
+                                    VerticalAlignment="Bottom"
+                                                                  />
+                            <TimePicker x:ConnectionId='9' Grid.Column="2"
+                                        x:Name="DailyTimePicker"
+                                        Header="Run at"
+                                        ClockIdentifier="24HourClock" />
+                            <NumberBox x:ConnectionId='10' Grid.Column="3"
+                                       x:Name="CountDaily"
+                                       Header="Keep snapshots"
+                                       Minimum="1" Maximum="999"
+                                       SpinButtonPlacementMode="Compact"
+                                       Width="130" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- ── Restic executable ── -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="Restic Executable"
+                           Style="{StaticResource SubtitleTextBlockStyle}" />
+                <TextBlock Text="Leave blank to use restic from PATH, or browse to the .exe."
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Opacity="0.6" />
+
+                <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="8" Padding="16"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="1">
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox x:ConnectionId='4' x:Name="ResticPathBox"
+                                 PlaceholderText="restic.exe  (auto-detected from PATH)" />
+                        <Button x:ConnectionId='5' Grid.Column="1"
+                                Content="Browse"
+                                VerticalAlignment="Bottom"
+                                                           />
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <!-- ── Apply / Save ── -->
+            <Button x:ConnectionId='3' x:Name="ApplyButton"
+                    Content="Apply and Save"
+                    Style="{StaticResource AccentButtonStyle}"
+                    HorizontalAlignment="Right"
+                                        />
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>
+

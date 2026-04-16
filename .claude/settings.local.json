@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(grep -v \"^$\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(e\\) for e in d.get\\('errors',[]\\)+d.get\\('warnings',[]\\)]\")",
+      "Bash(cat \"C:/Users/pao/Desktop/acorn/obj/x64/Debug/net8.0-windows10.0.19041.0/win-x64/intermediatexaml/\"*.log)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('diagnostics','none'\\), indent=2\\)\\)\")",
+      "Bash(python3 -c ':*)",
+      "Bash(node -e ':*)",
+      "Bash(grep -v \"^$\\\\|message :\\\\|property reassignment\\\\|Finding best RID\\\\|ExcludeRestore\\\\|WorkloadAuto\\\\|WorkloadManifest\")",
+      "Bash(grep -v \"^$\\\\|message :\\\\|property reassignment\\\\|Finding best RID\\\\|ExcludeRestore\\\\|WorkloadAuto\\\\|WorkloadManifest\\\\|Overriding target\\\\|ReferenceAssembly\\\\|Determining projects\")"
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "acorn (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "acorn (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
