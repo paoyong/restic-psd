@@ -12,71 +12,39 @@ namespace acorn.Services
         private static readonly string ScriptsFolder =
             Path.Combine(ApplicationData.Current.LocalFolder.Path, "Scripts");
 
-        private const string TaskFolderPrefix = "Acorn\\Backup_";
-        private const int MaxTrackedTasks = 50;
-
         public static void Apply(AppConfig config)
         {
             Directory.CreateDirectory(ScriptsFolder);
 
-            // Remove all previously registered tasks (brute-force up to MaxTrackedTasks)
-            for (int i = 0; i < MaxTrackedTasks; i++)
-                RemoveTask($"{TaskFolderPrefix}{i}");
+            RemoveTrackedTasks();
+            RemoveGeneratedScripts();
 
             if (!config.BackupsEnabled) return;
+
+            var configKey = ResticCommandScriptBuilder.BuildConfigKey(ConfigService.ConfigPath);
+            var configScriptsFolder = Path.Combine(ScriptsFolder, configKey);
+            Directory.CreateDirectory(configScriptsFolder);
 
             for (int i = 0; i < config.Schedules.Count; i++)
             {
                 var schedule = config.Schedules[i];
                 if (string.IsNullOrWhiteSpace(schedule.RepoFolder)) continue;
 
-                var taskName   = $"{TaskFolderPrefix}{i}";
-                var scriptPath = GenerateScript(config, schedule, i);
-                var totalMin   = (int)Math.Round(schedule.IntervalHours * 60);
-
-                if (totalMin >= 1440)
-                    RegisterDailyTask(taskName, scriptPath, schedule.StartTime);
-                else
-                    RegisterMinuteTask(taskName, scriptPath, Math.Max(1, totalMin));
+                var taskName = BuildTaskName(configKey, schedule, i);
+                var scriptPath = GenerateScript(config, schedule, configScriptsFolder, i);
+                RegisterHourlyTask(taskName, scriptPath, schedule.IntervalHours);
             }
         }
 
-        // ── Script generation ─────────────────────────────────────────────────
-
-        private static string GenerateScript(AppConfig config, BackupSchedule schedule, int index)
+        private static string GenerateScript(AppConfig config, BackupSchedule schedule, string configScriptsFolder, int index)
         {
-            var path    = Path.Combine(ScriptsFolder, $"backup_{index}.ps1");
-            var keyFile = Path.Combine(ScriptsFolder, "restic.key");
+            var path = Path.Combine(configScriptsFolder, $"backup_task_{index}_{schedule.IntervalHours}_hours.bat");
+            var keyFile = Path.Combine(configScriptsFolder, "restic.key");
+            var scriptContent = ResticCommandScriptBuilder.BuildBatchScript(config, schedule, keyFile);
 
-            string QuoteList(System.Collections.Generic.IEnumerable<string> items) =>
-                string.Join(", ", items.Select(i => "'" + i.Replace("'", "''") + "'"));
-
-            var folderArgs  = QuoteList(config.FoldersWatched);
-            var includeArgs = QuoteList(config.IncludePatterns.Select(p => "--include=" + p));
-            var excludeArgs = QuoteList(config.ExcludePatterns.Select(p => "--exclude=" + p));
-
-            var sb = new System.Text.StringBuilder();
-            sb.AppendLine("$ErrorActionPreference = 'Stop'");
-            sb.AppendLine("$restic = 'restic'");
-            sb.AppendLine($"$env:RESTIC_REPOSITORY = '{schedule.RepoFolder.Replace("'", "''")}'");
-            sb.AppendLine($"$env:RESTIC_PASSWORD_FILE = '{keyFile.Replace("'", "''")}'");
-            sb.AppendLine();
-            sb.AppendLine($"$folders = @({folderArgs})");
-            sb.AppendLine($"$bkArgs  = @({includeArgs}, {excludeArgs})");
-            sb.AppendLine();
-            sb.AppendLine("if (-not (Test-Path $env:RESTIC_REPOSITORY)) {");
-            sb.AppendLine("    New-Item -ItemType Directory -Force -Path $env:RESTIC_REPOSITORY | Out-Null");
-            sb.AppendLine("    & $restic init");
-            sb.AppendLine("}");
-            sb.AppendLine();
-            sb.AppendLine("& $restic backup $folders $bkArgs --no-scan");
-            sb.AppendLine($"& $restic forget --keep-last {schedule.SnapshotCount} --prune");
-
-            File.WriteAllText(path, sb.ToString());
+            File.WriteAllText(path, scriptContent);
             return path;
         }
-
-        // ── schtasks helpers ──────────────────────────────────────────────────
 
         private static void Schtasks(string args)
         {
@@ -90,19 +58,45 @@ namespace acorn.Services
             p?.WaitForExit();
         }
 
-        private static string PsCommand(string scriptPath) =>
-            $"powershell.exe -ExecutionPolicy Bypass -NonInteractive -File \"{scriptPath}\"";
-
-        private static void RegisterMinuteTask(string name, string scriptPath, int minutes)
+        private static void RemoveTrackedTasks()
         {
-            RemoveTask(name);
-            Schtasks($"/create /tn \"{name}\" /tr \"{PsCommand(scriptPath)}\" /sc minute /mo {minutes} /f");
+            using var p = Process.Start(new ProcessStartInfo("schtasks.exe", "/query /fo csv /nh")
+            {
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            });
+
+            var output = p?.StandardOutput.ReadToEnd() ?? string.Empty;
+            p?.WaitForExit();
+
+            var taskNames = output
+                .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(line => line.Split(',').FirstOrDefault()?.Trim('"'))
+                .Where(name => !string.IsNullOrWhiteSpace(name) && name.StartsWith("Acorn\\Backup_", StringComparison.OrdinalIgnoreCase))
+                .Distinct(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var taskName in taskNames)
+                RemoveTask(taskName!);
         }
 
-        private static void RegisterDailyTask(string name, string scriptPath, string time)
+        private static void RemoveGeneratedScripts()
+        {
+            if (!Directory.Exists(ScriptsFolder))
+                return;
+
+            foreach (var directory in Directory.GetDirectories(ScriptsFolder))
+                Directory.Delete(directory, true);
+        }
+
+        private static string BuildTaskName(string configKey, BackupSchedule schedule, int index) =>
+            $"Acorn\\Backup_{configKey}_{schedule.IntervalHours}_hours_{index}";
+
+        private static void RegisterHourlyTask(string name, string scriptPath, int hours)
         {
             RemoveTask(name);
-            Schtasks($"/create /tn \"{name}\" /tr \"{PsCommand(scriptPath)}\" /sc daily /st \"{time}\" /f");
+            Schtasks($"/create /tn \"{name}\" /tr \"\\\"{scriptPath}\\\"\" /sc hourly /mo {Math.Max(1, hours)} /f");
         }
 
         public static void RemoveTask(string name) =>

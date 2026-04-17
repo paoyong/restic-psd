@@ -13,35 +13,35 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <NavigationView x:ConnectionId='2'
-        x:Name="NavView"
-        PaneTitle="Acorn"
-        IsBackButtonVisible="Collapsed"
-        PaneDisplayMode="Left"
-        IsSettingsVisible="False"
-                                                   
-                               >
-
+    <NavigationView x:ConnectionId='2' x:Name="AppNav"
+                    PaneTitle="Acorn"
+                    IsBackButtonVisible="Collapsed"
+                    IsSettingsVisible="False"
+                    PaneDisplayMode="Left"
+                                          
+                                                              >
         <NavigationView.MenuItems>
-            <NavigationViewItem Tag="Backups" Content="Backups">
+            <NavigationViewItem x:ConnectionId='3' x:Name="StatusNavItem" Tag="Status" Content="Status">
                 <NavigationViewItem.Icon>
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE753;" />
+                    <BitmapIcon UriSource="ms-appx:///Assets/Nav/status.png" ShowAsMonochrome="False" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem Tag="Status" Content="Status">
+            <NavigationViewItem x:ConnectionId='4' x:Name="BackupSettingsNavItem" Tag="BackupSettings" Content="Backup Settings">
                 <NavigationViewItem.Icon>
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE9F9;" />
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
-            <NavigationViewItem Tag="Restore" Content="Restore">
-                <NavigationViewItem.Icon>
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE777;" />
+                    <BitmapIcon UriSource="ms-appx:///Assets/Nav/backups.png" ShowAsMonochrome="False" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
         </NavigationView.MenuItems>
 
-        <Frame x:ConnectionId='3' x:Name="ContentFrame" />
+        <NavigationView.FooterMenuItems>
+            <NavigationViewItem x:ConnectionId='5' x:Name="SettingsNavItem" Tag="Settings" Content="Settings">
+                <NavigationViewItem.Icon>
+                    <SymbolIcon Symbol="Setting" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.FooterMenuItems>
 
+        <Frame x:ConnectionId='6' x:Name="ContentFrame" />
     </NavigationView>
 </Window>
 

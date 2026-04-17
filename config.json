@@ -16,12 +16,12 @@
     {
       "interval_hours": 1,
       "snapshot_count": 3,
-      "repo_folder": "D:/backups/acorn_1h_backups"
+      "repo_folder": "D:/backups/acorn_1_hours_backups"
     },
     {
       "interval_hours": 24,
       "snapshot_count": 5,
-      "repo_folder": "D:/backups/acorn_24h_backups"
+      "repo_folder": "D:/backups/acorn_24_hours_backups"
     }
   ]
 }

@@ -6,10 +6,6 @@
     xmlns:local="using:acorn">
     <Application.Resources>
         <ResourceDictionary>
-            <Style x:Key="NavIconStyle" TargetType="FontIcon">
-                <Setter Property="FontFamily" Value="Segoe Fluent Icons"/>
-                <Setter Property="FontSize" Value="16"/>
-            </Style>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <!-- Other merged dictionaries here -->
@@ -18,3 +14,4 @@
         </ResourceDictionary>
     </Application.Resources>
 </Application>
+

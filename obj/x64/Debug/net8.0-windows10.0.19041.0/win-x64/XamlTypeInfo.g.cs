@@ -226,7 +226,7 @@ namespace acorn.acorn_XamlTypeInfo
         
         private void InitTypeTables()
         {
-            _typeNameTable = new string[52];
+            _typeNameTable = new string[49];
             _typeNameTable[0] = "Microsoft.UI.Xaml.Controls.XamlControlsResources";
             _typeNameTable[1] = "Microsoft.UI.Xaml.ResourceDictionary";
             _typeNameTable[2] = "Object";
@@ -268,19 +268,16 @@ namespace acorn.acorn_XamlTypeInfo
             _typeNameTable[38] = "System.Windows.Input.ICommand";
             _typeNameTable[39] = "Microsoft.UI.Xaml.Controls.IconSource";
             _typeNameTable[40] = "Microsoft.UI.Xaml.Controls.InfoBarTemplateSettings";
-            _typeNameTable[41] = "acorn.Pages.BackupsPage";
+            _typeNameTable[41] = "acorn.Pages.BackupSettingsPage";
             _typeNameTable[42] = "Microsoft.UI.Xaml.Controls.Page";
             _typeNameTable[43] = "Microsoft.UI.Xaml.Controls.UserControl";
-            _typeNameTable[44] = "acorn.Pages.RestorePage";
-            _typeNameTable[45] = "Microsoft.UI.Xaml.Controls.ProgressBar";
-            _typeNameTable[46] = "Microsoft.UI.Xaml.Controls.Primitives.RangeBase";
-            _typeNameTable[47] = "Microsoft.UI.Xaml.Controls.ProgressBarTemplateSettings";
-            _typeNameTable[48] = "acorn.Pages.StatusPage";
-            _typeNameTable[49] = "Microsoft.UI.Xaml.Controls.TreeViewNode";
-            _typeNameTable[50] = "System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>";
-            _typeNameTable[51] = "Int32";
+            _typeNameTable[44] = "acorn.Pages.SettingsPage";
+            _typeNameTable[45] = "acorn.Pages.StatusPage";
+            _typeNameTable[46] = "Microsoft.UI.Xaml.Controls.TreeViewNode";
+            _typeNameTable[47] = "System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>";
+            _typeNameTable[48] = "Int32";
 
-            _typeTable = new global::System.Type[52];
+            _typeTable = new global::System.Type[49];
             _typeTable[0] = typeof(global::Microsoft.UI.Xaml.Controls.XamlControlsResources);
             _typeTable[1] = typeof(global::Microsoft.UI.Xaml.ResourceDictionary);
             _typeTable[2] = typeof(global::System.Object);
@@ -322,17 +319,14 @@ namespace acorn.acorn_XamlTypeInfo
             _typeTable[38] = typeof(global::System.Windows.Input.ICommand);
             _typeTable[39] = typeof(global::Microsoft.UI.Xaml.Controls.IconSource);
             _typeTable[40] = typeof(global::Microsoft.UI.Xaml.Controls.InfoBarTemplateSettings);
-            _typeTable[41] = typeof(global::acorn.Pages.BackupsPage);
+            _typeTable[41] = typeof(global::acorn.Pages.BackupSettingsPage);
             _typeTable[42] = typeof(global::Microsoft.UI.Xaml.Controls.Page);
             _typeTable[43] = typeof(global::Microsoft.UI.Xaml.Controls.UserControl);
-            _typeTable[44] = typeof(global::acorn.Pages.RestorePage);
-            _typeTable[45] = typeof(global::Microsoft.UI.Xaml.Controls.ProgressBar);
-            _typeTable[46] = typeof(global::Microsoft.UI.Xaml.Controls.Primitives.RangeBase);
-            _typeTable[47] = typeof(global::Microsoft.UI.Xaml.Controls.ProgressBarTemplateSettings);
-            _typeTable[48] = typeof(global::acorn.Pages.StatusPage);
-            _typeTable[49] = typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode);
-            _typeTable[50] = typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>);
-            _typeTable[51] = typeof(global::System.Int32);
+            _typeTable[44] = typeof(global::acorn.Pages.SettingsPage);
+            _typeTable[45] = typeof(global::acorn.Pages.StatusPage);
+            _typeTable[46] = typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode);
+            _typeTable[47] = typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>);
+            _typeTable[48] = typeof(global::System.Int32);
         }
 
         private int LookupTypeIndexByName(string typeName)
@@ -376,11 +370,10 @@ namespace acorn.acorn_XamlTypeInfo
         private object Activate_33_MainWindow() { return new global::acorn.MainWindow(); }
         private object Activate_35_InfoBar() { return new global::Microsoft.UI.Xaml.Controls.InfoBar(); }
         private object Activate_40_InfoBarTemplateSettings() { return new global::Microsoft.UI.Xaml.Controls.InfoBarTemplateSettings(); }
-        private object Activate_41_BackupsPage() { return new global::acorn.Pages.BackupsPage(); }
-        private object Activate_44_RestorePage() { return new global::acorn.Pages.RestorePage(); }
-        private object Activate_45_ProgressBar() { return new global::Microsoft.UI.Xaml.Controls.ProgressBar(); }
-        private object Activate_48_StatusPage() { return new global::acorn.Pages.StatusPage(); }
-        private object Activate_49_TreeViewNode() { return new global::Microsoft.UI.Xaml.Controls.TreeViewNode(); }
+        private object Activate_41_BackupSettingsPage() { return new global::acorn.Pages.BackupSettingsPage(); }
+        private object Activate_44_SettingsPage() { return new global::acorn.Pages.SettingsPage(); }
+        private object Activate_45_StatusPage() { return new global::acorn.Pages.StatusPage(); }
+        private object Activate_46_TreeViewNode() { return new global::Microsoft.UI.Xaml.Controls.TreeViewNode(); }
         private void StaticInitializer_0_XamlControlsResources() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.XamlControlsResources).TypeHandle);
         private void StaticInitializer_4_MicaBackdrop() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Media.MicaBackdrop).TypeHandle);
         private void StaticInitializer_6_MicaKind() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Composition.SystemBackdrops.MicaKind).TypeHandle);
@@ -403,13 +396,11 @@ namespace acorn.acorn_XamlTypeInfo
         private void StaticInitializer_36_InfoBarSeverity() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.InfoBarSeverity).TypeHandle);
         private void StaticInitializer_38_ICommand() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Windows.Input.ICommand).TypeHandle);
         private void StaticInitializer_40_InfoBarTemplateSettings() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.InfoBarTemplateSettings).TypeHandle);
-        private void StaticInitializer_41_BackupsPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::acorn.Pages.BackupsPage).TypeHandle);
-        private void StaticInitializer_44_RestorePage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::acorn.Pages.RestorePage).TypeHandle);
-        private void StaticInitializer_45_ProgressBar() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.ProgressBar).TypeHandle);
-        private void StaticInitializer_47_ProgressBarTemplateSettings() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.ProgressBarTemplateSettings).TypeHandle);
-        private void StaticInitializer_48_StatusPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::acorn.Pages.StatusPage).TypeHandle);
-        private void StaticInitializer_49_TreeViewNode() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode).TypeHandle);
-        private void StaticInitializer_50_IList() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>).TypeHandle);
+        private void StaticInitializer_41_BackupSettingsPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::acorn.Pages.BackupSettingsPage).TypeHandle);
+        private void StaticInitializer_44_SettingsPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::acorn.Pages.SettingsPage).TypeHandle);
+        private void StaticInitializer_45_StatusPage() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::acorn.Pages.StatusPage).TypeHandle);
+        private void StaticInitializer_46_TreeViewNode() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::Microsoft.UI.Xaml.Controls.TreeViewNode).TypeHandle);
+        private void StaticInitializer_47_IList() => global::System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(typeof(global::System.Collections.Generic.IList<global::Microsoft.UI.Xaml.Controls.TreeViewNode>).TypeHandle);
         private void MapAdd_0_XamlControlsResources(object instance, object key, object item)
         {
             var collection = (global::System.Collections.Generic.IDictionary<global::System.Object, global::System.Object>)instance;
@@ -423,7 +414,7 @@ namespace acorn.acorn_XamlTypeInfo
             var newItem = (global::System.Object)item;
             collection.Add(newItem);
         }
-        private void VectorAdd_50_IList(object instance, object item)
+        private void VectorAdd_47_IList(object instance, object item)
         {
             var collection = (global::System.Collections.Generic.ICollection<global::Microsoft.UI.Xaml.Controls.TreeViewNode>)instance;
             var newItem = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)item;
@@ -499,9 +490,10 @@ namespace acorn.acorn_XamlTypeInfo
                 userType.StaticInitializer = StaticInitializer_9_NavigationView;
                 userType.AddMemberName("PaneTitle");
                 userType.AddMemberName("IsBackButtonVisible");
-                userType.AddMemberName("PaneDisplayMode");
                 userType.AddMemberName("IsSettingsVisible");
+                userType.AddMemberName("PaneDisplayMode");
                 userType.AddMemberName("MenuItems");
+                userType.AddMemberName("FooterMenuItems");
                 userType.AddMemberName("AlwaysShowHeader");
                 userType.AddMemberName("AutoSuggestBox");
                 userType.AddMemberName("CompactModeThresholdWidth");
@@ -509,7 +501,6 @@ namespace acorn.acorn_XamlTypeInfo
                 userType.AddMemberName("ContentOverlay");
                 userType.AddMemberName("DisplayMode");
                 userType.AddMemberName("ExpandedModeThresholdWidth");
-                userType.AddMemberName("FooterMenuItems");
                 userType.AddMemberName("FooterMenuItemsSource");
                 userType.AddMemberName("Header");
                 userType.AddMemberName("HeaderTemplate");
@@ -750,10 +741,10 @@ namespace acorn.acorn_XamlTypeInfo
                 xamlType = userType;
                 break;
 
-            case 41:   //  acorn.Pages.BackupsPage
+            case 41:   //  acorn.Pages.BackupSettingsPage
                 userType = new global::acorn.acorn_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_41_BackupsPage;
-                userType.StaticInitializer = StaticInitializer_41_BackupsPage;
+                userType.Activator = Activate_41_BackupSettingsPage;
+                userType.StaticInitializer = StaticInitializer_41_BackupSettingsPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
@@ -766,48 +757,26 @@ namespace acorn.acorn_XamlTypeInfo
                 xamlType = new global::acorn.acorn_XamlTypeInfo.XamlSystemBaseType(typeName, type);
                 break;
 
-            case 44:   //  acorn.Pages.RestorePage
+            case 44:   //  acorn.Pages.SettingsPage
                 userType = new global::acorn.acorn_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_44_RestorePage;
-                userType.StaticInitializer = StaticInitializer_44_RestorePage;
+                userType.Activator = Activate_44_SettingsPage;
+                userType.StaticInitializer = StaticInitializer_44_SettingsPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 45:   //  Microsoft.UI.Xaml.Controls.ProgressBar
-                userType = new global::acorn.acorn_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Primitives.RangeBase"));
-                userType.Activator = Activate_45_ProgressBar;
-                userType.StaticInitializer = StaticInitializer_45_ProgressBar;
-                userType.AddMemberName("IsIndeterminate");
-                userType.AddMemberName("ShowError");
-                userType.AddMemberName("ShowPaused");
-                userType.AddMemberName("TemplateSettings");
-                xamlType = userType;
-                break;
-
-            case 46:   //  Microsoft.UI.Xaml.Controls.Primitives.RangeBase
-                xamlType = new global::acorn.acorn_XamlTypeInfo.XamlSystemBaseType(typeName, type);
-                break;
-
-            case 47:   //  Microsoft.UI.Xaml.Controls.ProgressBarTemplateSettings
-                userType = new global::acorn.acorn_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.DependencyObject"));
-                userType.StaticInitializer = StaticInitializer_47_ProgressBarTemplateSettings;
-                userType.SetIsReturnTypeStub();
-                xamlType = userType;
-                break;
-
-            case 48:   //  acorn.Pages.StatusPage
+            case 45:   //  acorn.Pages.StatusPage
                 userType = new global::acorn.acorn_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.Controls.Page"));
-                userType.Activator = Activate_48_StatusPage;
-                userType.StaticInitializer = StaticInitializer_48_StatusPage;
+                userType.Activator = Activate_45_StatusPage;
+                userType.StaticInitializer = StaticInitializer_45_StatusPage;
                 userType.SetIsLocalType();
                 xamlType = userType;
                 break;
 
-            case 49:   //  Microsoft.UI.Xaml.Controls.TreeViewNode
+            case 46:   //  Microsoft.UI.Xaml.Controls.TreeViewNode
                 userType = new global::acorn.acorn_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Microsoft.UI.Xaml.DependencyObject"));
-                userType.Activator = Activate_49_TreeViewNode;
-                userType.StaticInitializer = StaticInitializer_49_TreeViewNode;
+                userType.Activator = Activate_46_TreeViewNode;
+                userType.StaticInitializer = StaticInitializer_46_TreeViewNode;
                 userType.AddMemberName("Children");
                 userType.AddMemberName("Content");
                 userType.AddMemberName("Depth");
@@ -819,15 +788,15 @@ namespace acorn.acorn_XamlTypeInfo
                 xamlType = userType;
                 break;
 
-            case 50:   //  System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>
+            case 47:   //  System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>
                 userType = new global::acorn.acorn_XamlTypeInfo.XamlUserType(this, typeName, type, null);
-                userType.StaticInitializer = StaticInitializer_50_IList;
-                userType.CollectionAdd = VectorAdd_50_IList;
+                userType.StaticInitializer = StaticInitializer_47_IList;
+                userType.CollectionAdd = VectorAdd_47_IList;
                 userType.SetIsReturnTypeStub();
                 xamlType = userType;
                 break;
 
-            case 51:   //  Int32
+            case 48:   //  Int32
                 xamlType = new global::acorn.acorn_XamlTypeInfo.XamlSystemBaseType(typeName, type);
                 break;
             }
@@ -929,100 +898,100 @@ namespace acorn.acorn_XamlTypeInfo
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             that.IsBackButtonVisible = (global::Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible)Value;
         }
-        private object get_4_NavigationView_PaneDisplayMode(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.PaneDisplayMode;
-        }
-        private void set_4_NavigationView_PaneDisplayMode(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            that.PaneDisplayMode = (global::Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode)Value;
-        }
-        private object get_5_NavigationView_IsSettingsVisible(object instance)
+        private object get_4_NavigationView_IsSettingsVisible(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             return that.IsSettingsVisible;
         }
-        private void set_5_NavigationView_IsSettingsVisible(object instance, object Value)
+        private void set_4_NavigationView_IsSettingsVisible(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             that.IsSettingsVisible = (global::System.Boolean)Value;
+        }
+        private object get_5_NavigationView_PaneDisplayMode(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.PaneDisplayMode;
+        }
+        private void set_5_NavigationView_PaneDisplayMode(object instance, object Value)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            that.PaneDisplayMode = (global::Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode)Value;
         }
         private object get_6_NavigationView_MenuItems(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             return that.MenuItems;
         }
-        private object get_7_NavigationView_AlwaysShowHeader(object instance)
+        private object get_7_NavigationView_FooterMenuItems(object instance)
+        {
+            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
+            return that.FooterMenuItems;
+        }
+        private object get_8_NavigationView_AlwaysShowHeader(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             return that.AlwaysShowHeader;
         }
-        private void set_7_NavigationView_AlwaysShowHeader(object instance, object Value)
+        private void set_8_NavigationView_AlwaysShowHeader(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             that.AlwaysShowHeader = (global::System.Boolean)Value;
         }
-        private object get_8_NavigationView_AutoSuggestBox(object instance)
+        private object get_9_NavigationView_AutoSuggestBox(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             return that.AutoSuggestBox;
         }
-        private void set_8_NavigationView_AutoSuggestBox(object instance, object Value)
+        private void set_9_NavigationView_AutoSuggestBox(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             that.AutoSuggestBox = (global::Microsoft.UI.Xaml.Controls.AutoSuggestBox)Value;
         }
-        private object get_9_NavigationView_CompactModeThresholdWidth(object instance)
+        private object get_10_NavigationView_CompactModeThresholdWidth(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             return that.CompactModeThresholdWidth;
         }
-        private void set_9_NavigationView_CompactModeThresholdWidth(object instance, object Value)
+        private void set_10_NavigationView_CompactModeThresholdWidth(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             that.CompactModeThresholdWidth = (global::System.Double)Value;
         }
-        private object get_10_NavigationView_CompactPaneLength(object instance)
+        private object get_11_NavigationView_CompactPaneLength(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             return that.CompactPaneLength;
         }
-        private void set_10_NavigationView_CompactPaneLength(object instance, object Value)
+        private void set_11_NavigationView_CompactPaneLength(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             that.CompactPaneLength = (global::System.Double)Value;
         }
-        private object get_11_NavigationView_ContentOverlay(object instance)
+        private object get_12_NavigationView_ContentOverlay(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             return that.ContentOverlay;
         }
-        private void set_11_NavigationView_ContentOverlay(object instance, object Value)
+        private void set_12_NavigationView_ContentOverlay(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             that.ContentOverlay = (global::Microsoft.UI.Xaml.UIElement)Value;
         }
-        private object get_12_NavigationView_DisplayMode(object instance)
+        private object get_13_NavigationView_DisplayMode(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             return that.DisplayMode;
         }
-        private object get_13_NavigationView_ExpandedModeThresholdWidth(object instance)
+        private object get_14_NavigationView_ExpandedModeThresholdWidth(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             return that.ExpandedModeThresholdWidth;
         }
-        private void set_13_NavigationView_ExpandedModeThresholdWidth(object instance, object Value)
+        private void set_14_NavigationView_ExpandedModeThresholdWidth(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
             that.ExpandedModeThresholdWidth = (global::System.Double)Value;
-        }
-        private object get_14_NavigationView_FooterMenuItems(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.NavigationView)instance;
-            return that.FooterMenuItems;
         }
         private object get_15_NavigationView_FooterMenuItemsSource(object instance)
         {
@@ -1479,87 +1448,52 @@ namespace acorn.acorn_XamlTypeInfo
             var that = (global::Microsoft.UI.Xaml.Controls.InfoBar)instance;
             return that.TemplateSettings;
         }
-        private object get_63_ProgressBar_IsIndeterminate(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.ProgressBar)instance;
-            return that.IsIndeterminate;
-        }
-        private void set_63_ProgressBar_IsIndeterminate(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.ProgressBar)instance;
-            that.IsIndeterminate = (global::System.Boolean)Value;
-        }
-        private object get_64_ProgressBar_ShowError(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.ProgressBar)instance;
-            return that.ShowError;
-        }
-        private void set_64_ProgressBar_ShowError(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.ProgressBar)instance;
-            that.ShowError = (global::System.Boolean)Value;
-        }
-        private object get_65_ProgressBar_ShowPaused(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.ProgressBar)instance;
-            return that.ShowPaused;
-        }
-        private void set_65_ProgressBar_ShowPaused(object instance, object Value)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.ProgressBar)instance;
-            that.ShowPaused = (global::System.Boolean)Value;
-        }
-        private object get_66_ProgressBar_TemplateSettings(object instance)
-        {
-            var that = (global::Microsoft.UI.Xaml.Controls.ProgressBar)instance;
-            return that.TemplateSettings;
-        }
-        private object get_67_TreeViewNode_Children(object instance)
+        private object get_63_TreeViewNode_Children(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Children;
         }
-        private object get_68_TreeViewNode_Content(object instance)
+        private object get_64_TreeViewNode_Content(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Content;
         }
-        private void set_68_TreeViewNode_Content(object instance, object Value)
+        private void set_64_TreeViewNode_Content(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             that.Content = (global::System.Object)Value;
         }
-        private object get_69_TreeViewNode_Depth(object instance)
+        private object get_65_TreeViewNode_Depth(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Depth;
         }
-        private object get_70_TreeViewNode_HasChildren(object instance)
+        private object get_66_TreeViewNode_HasChildren(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.HasChildren;
         }
-        private object get_71_TreeViewNode_HasUnrealizedChildren(object instance)
+        private object get_67_TreeViewNode_HasUnrealizedChildren(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.HasUnrealizedChildren;
         }
-        private void set_71_TreeViewNode_HasUnrealizedChildren(object instance, object Value)
+        private void set_67_TreeViewNode_HasUnrealizedChildren(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             that.HasUnrealizedChildren = (global::System.Boolean)Value;
         }
-        private object get_72_TreeViewNode_IsExpanded(object instance)
+        private object get_68_TreeViewNode_IsExpanded(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.IsExpanded;
         }
-        private void set_72_TreeViewNode_IsExpanded(object instance, object Value)
+        private void set_68_TreeViewNode_IsExpanded(object instance, object Value)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             that.IsExpanded = (global::System.Boolean)Value;
         }
-        private object get_73_TreeViewNode_Parent(object instance)
+        private object get_69_TreeViewNode_Parent(object instance)
         {
             var that = (global::Microsoft.UI.Xaml.Controls.TreeViewNode)instance;
             return that.Parent;
@@ -1600,19 +1534,19 @@ namespace acorn.acorn_XamlTypeInfo
                 xamlMember.Getter = get_3_NavigationView_IsBackButtonVisible;
                 xamlMember.Setter = set_3_NavigationView_IsBackButtonVisible;
                 break;
-            case "Microsoft.UI.Xaml.Controls.NavigationView.PaneDisplayMode":
-                userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
-                xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "PaneDisplayMode", "Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode");
-                xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_4_NavigationView_PaneDisplayMode;
-                xamlMember.Setter = set_4_NavigationView_PaneDisplayMode;
-                break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.IsSettingsVisible":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "IsSettingsVisible", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_5_NavigationView_IsSettingsVisible;
-                xamlMember.Setter = set_5_NavigationView_IsSettingsVisible;
+                xamlMember.Getter = get_4_NavigationView_IsSettingsVisible;
+                xamlMember.Setter = set_4_NavigationView_IsSettingsVisible;
+                break;
+            case "Microsoft.UI.Xaml.Controls.NavigationView.PaneDisplayMode":
+                userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
+                xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "PaneDisplayMode", "Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_5_NavigationView_PaneDisplayMode;
+                xamlMember.Setter = set_5_NavigationView_PaneDisplayMode;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.MenuItems":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
@@ -1621,61 +1555,61 @@ namespace acorn.acorn_XamlTypeInfo
                 xamlMember.Getter = get_6_NavigationView_MenuItems;
                 xamlMember.SetIsReadOnly();
                 break;
+            case "Microsoft.UI.Xaml.Controls.NavigationView.FooterMenuItems":
+                userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
+                xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "FooterMenuItems", "System.Collections.Generic.IList`1<Object>");
+                xamlMember.SetIsDependencyProperty();
+                xamlMember.Getter = get_7_NavigationView_FooterMenuItems;
+                xamlMember.SetIsReadOnly();
+                break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.AlwaysShowHeader":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "AlwaysShowHeader", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_7_NavigationView_AlwaysShowHeader;
-                xamlMember.Setter = set_7_NavigationView_AlwaysShowHeader;
+                xamlMember.Getter = get_8_NavigationView_AlwaysShowHeader;
+                xamlMember.Setter = set_8_NavigationView_AlwaysShowHeader;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.AutoSuggestBox":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "AutoSuggestBox", "Microsoft.UI.Xaml.Controls.AutoSuggestBox");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_8_NavigationView_AutoSuggestBox;
-                xamlMember.Setter = set_8_NavigationView_AutoSuggestBox;
+                xamlMember.Getter = get_9_NavigationView_AutoSuggestBox;
+                xamlMember.Setter = set_9_NavigationView_AutoSuggestBox;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.CompactModeThresholdWidth":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "CompactModeThresholdWidth", "Double");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_9_NavigationView_CompactModeThresholdWidth;
-                xamlMember.Setter = set_9_NavigationView_CompactModeThresholdWidth;
+                xamlMember.Getter = get_10_NavigationView_CompactModeThresholdWidth;
+                xamlMember.Setter = set_10_NavigationView_CompactModeThresholdWidth;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.CompactPaneLength":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "CompactPaneLength", "Double");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_10_NavigationView_CompactPaneLength;
-                xamlMember.Setter = set_10_NavigationView_CompactPaneLength;
+                xamlMember.Getter = get_11_NavigationView_CompactPaneLength;
+                xamlMember.Setter = set_11_NavigationView_CompactPaneLength;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.ContentOverlay":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "ContentOverlay", "Microsoft.UI.Xaml.UIElement");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_11_NavigationView_ContentOverlay;
-                xamlMember.Setter = set_11_NavigationView_ContentOverlay;
+                xamlMember.Getter = get_12_NavigationView_ContentOverlay;
+                xamlMember.Setter = set_12_NavigationView_ContentOverlay;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.DisplayMode":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "DisplayMode", "Microsoft.UI.Xaml.Controls.NavigationViewDisplayMode");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_12_NavigationView_DisplayMode;
+                xamlMember.Getter = get_13_NavigationView_DisplayMode;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.ExpandedModeThresholdWidth":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "ExpandedModeThresholdWidth", "Double");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_13_NavigationView_ExpandedModeThresholdWidth;
-                xamlMember.Setter = set_13_NavigationView_ExpandedModeThresholdWidth;
-                break;
-            case "Microsoft.UI.Xaml.Controls.NavigationView.FooterMenuItems":
-                userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
-                xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "FooterMenuItems", "System.Collections.Generic.IList`1<Object>");
-                xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_14_NavigationView_FooterMenuItems;
-                xamlMember.SetIsReadOnly();
+                xamlMember.Getter = get_14_NavigationView_ExpandedModeThresholdWidth;
+                xamlMember.Setter = set_14_NavigationView_ExpandedModeThresholdWidth;
                 break;
             case "Microsoft.UI.Xaml.Controls.NavigationView.FooterMenuItemsSource":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.NavigationView");
@@ -2013,77 +1947,50 @@ namespace acorn.acorn_XamlTypeInfo
                 xamlMember.Getter = get_62_InfoBar_TemplateSettings;
                 xamlMember.SetIsReadOnly();
                 break;
-            case "Microsoft.UI.Xaml.Controls.ProgressBar.IsIndeterminate":
-                userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.ProgressBar");
-                xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "IsIndeterminate", "Boolean");
-                xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_63_ProgressBar_IsIndeterminate;
-                xamlMember.Setter = set_63_ProgressBar_IsIndeterminate;
-                break;
-            case "Microsoft.UI.Xaml.Controls.ProgressBar.ShowError":
-                userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.ProgressBar");
-                xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "ShowError", "Boolean");
-                xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_64_ProgressBar_ShowError;
-                xamlMember.Setter = set_64_ProgressBar_ShowError;
-                break;
-            case "Microsoft.UI.Xaml.Controls.ProgressBar.ShowPaused":
-                userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.ProgressBar");
-                xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "ShowPaused", "Boolean");
-                xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_65_ProgressBar_ShowPaused;
-                xamlMember.Setter = set_65_ProgressBar_ShowPaused;
-                break;
-            case "Microsoft.UI.Xaml.Controls.ProgressBar.TemplateSettings":
-                userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.ProgressBar");
-                xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "TemplateSettings", "Microsoft.UI.Xaml.Controls.ProgressBarTemplateSettings");
-                xamlMember.Getter = get_66_ProgressBar_TemplateSettings;
-                xamlMember.SetIsReadOnly();
-                break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Children":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "Children", "System.Collections.Generic.IList`1<Microsoft.UI.Xaml.Controls.TreeViewNode>");
-                xamlMember.Getter = get_67_TreeViewNode_Children;
+                xamlMember.Getter = get_63_TreeViewNode_Children;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Content":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "Content", "Object");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_68_TreeViewNode_Content;
-                xamlMember.Setter = set_68_TreeViewNode_Content;
+                xamlMember.Getter = get_64_TreeViewNode_Content;
+                xamlMember.Setter = set_64_TreeViewNode_Content;
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Depth":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "Depth", "Int32");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_69_TreeViewNode_Depth;
+                xamlMember.Getter = get_65_TreeViewNode_Depth;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.HasChildren":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "HasChildren", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_70_TreeViewNode_HasChildren;
+                xamlMember.Getter = get_66_TreeViewNode_HasChildren;
                 xamlMember.SetIsReadOnly();
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.HasUnrealizedChildren":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "HasUnrealizedChildren", "Boolean");
-                xamlMember.Getter = get_71_TreeViewNode_HasUnrealizedChildren;
-                xamlMember.Setter = set_71_TreeViewNode_HasUnrealizedChildren;
+                xamlMember.Getter = get_67_TreeViewNode_HasUnrealizedChildren;
+                xamlMember.Setter = set_67_TreeViewNode_HasUnrealizedChildren;
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.IsExpanded":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "IsExpanded", "Boolean");
                 xamlMember.SetIsDependencyProperty();
-                xamlMember.Getter = get_72_TreeViewNode_IsExpanded;
-                xamlMember.Setter = set_72_TreeViewNode_IsExpanded;
+                xamlMember.Getter = get_68_TreeViewNode_IsExpanded;
+                xamlMember.Setter = set_68_TreeViewNode_IsExpanded;
                 break;
             case "Microsoft.UI.Xaml.Controls.TreeViewNode.Parent":
                 userType = (global::acorn.acorn_XamlTypeInfo.XamlUserType)GetXamlTypeByName("Microsoft.UI.Xaml.Controls.TreeViewNode");
                 xamlMember = new global::acorn.acorn_XamlTypeInfo.XamlMember(this, "Parent", "Microsoft.UI.Xaml.Controls.TreeViewNode");
-                xamlMember.Getter = get_73_TreeViewNode_Parent;
+                xamlMember.Getter = get_69_TreeViewNode_Parent;
                 xamlMember.SetIsReadOnly();
                 break;
             }

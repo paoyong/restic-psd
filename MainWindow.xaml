@@ -13,34 +13,34 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <NavigationView
-        x:Name="NavView"
-        PaneTitle="Acorn"
-        IsBackButtonVisible="Collapsed"
-        PaneDisplayMode="Left"
-        IsSettingsVisible="False"
-        SelectionChanged="NavView_SelectionChanged"
-        Loaded="NavView_Loaded">
-
+    <NavigationView x:Name="AppNav"
+                    PaneTitle="Acorn"
+                    IsBackButtonVisible="Collapsed"
+                    IsSettingsVisible="False"
+                    PaneDisplayMode="Left"
+                    Loaded="AppNav_Loaded"
+                    SelectionChanged="AppNav_SelectionChanged">
         <NavigationView.MenuItems>
-            <NavigationViewItem Tag="Backups" Content="Backups">
+            <NavigationViewItem x:Name="StatusNavItem" Tag="Status" Content="Status">
                 <NavigationViewItem.Icon>
-                    <FontIcon Style="{StaticResource NavIconStyle}" Glyph="&#xEDA2;" />
+                    <BitmapIcon UriSource="ms-appx:///Assets/Nav/status.png" ShowAsMonochrome="False" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
-            <NavigationViewItem Tag="Status" Content="Status">
+            <NavigationViewItem x:Name="BackupSettingsNavItem" Tag="BackupSettings" Content="Backup Settings">
                 <NavigationViewItem.Icon>
-                    <FontIcon Style="{StaticResource NavIconStyle}" Glyph="&#xE9F9;" />
-                </NavigationViewItem.Icon>
-            </NavigationViewItem>
-            <NavigationViewItem Tag="Restore" Content="Restore">
-                <NavigationViewItem.Icon>
-                    <FontIcon Style="{StaticResource NavIconStyle}" Glyph="&#xE7A7;" />
+                    <BitmapIcon UriSource="ms-appx:///Assets/Nav/backups.png" ShowAsMonochrome="False" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
         </NavigationView.MenuItems>
 
-        <Frame x:Name="ContentFrame" />
+        <NavigationView.FooterMenuItems>
+            <NavigationViewItem x:Name="SettingsNavItem" Tag="Settings" Content="Settings">
+                <NavigationViewItem.Icon>
+                    <SymbolIcon Symbol="Setting" />
+                </NavigationViewItem.Icon>
+            </NavigationViewItem>
+        </NavigationView.FooterMenuItems>
 
+        <Frame x:Name="ContentFrame" />
     </NavigationView>
 </Window>

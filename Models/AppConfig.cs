@@ -4,10 +4,9 @@ namespace acorn.Models
 {
     public class BackupSchedule
     {
-        public double IntervalHours { get; set; } = 0.5;   // e.g. 0.5 = every 30 min, 24 = every day
+        public int IntervalHours { get; set; } = 1;
         public string RepoFolder { get; set; } = "";
         public int SnapshotCount { get; set; } = 5;
-        public string StartTime { get; set; } = "09:00";   // HH:mm — used as daily run time or first-run anchor
     }
 
     public class AppConfig

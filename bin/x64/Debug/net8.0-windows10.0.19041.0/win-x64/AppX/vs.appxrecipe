@@ -17,7 +17,7 @@
     <DeployOptionalPackages>false</DeployOptionalPackages>
     <WindowsSdkPath></WindowsSdkPath>
     <LayoutDir>C:\Users\pao\Desktop\acorn\bin\x64\Debug\net8.0-windows10.0.19041.0\win-x64\AppX</LayoutDir>
-    <RegisteredManifestChecksum>BE9CD5854805CB543A813409B821132041652D33EA8A014ADF2D62031E1C0137</RegisteredManifestChecksum>
+    <RegisteredManifestChecksum>820806CCB7485A3E3869C933366362AD8BBFE6E2B0D336B7A76BFB8BDAC5ACEE</RegisteredManifestChecksum>
     <RegisteredPackageMoniker>bdec8451-a2cc-455c-90b7-2bd5194e8bb3_1.0.0.0_x64__7c8cjb6pse5j2</RegisteredPackageMoniker>
     <RegisteredUserModeAppID>bdec8451-a2cc-455c-90b7-2bd5194e8bb3_7c8cjb6pse5j2!App</RegisteredUserModeAppID>
     <RegisteredPackageID>bdec8451-a2cc-455c-90b7-2bd5194e8bb3</RegisteredPackageID>
@@ -28,21 +28,21 @@
     <AppXManifest Include="C:\Users\pao\Desktop\acorn\bin\x64\Debug\net8.0-windows10.0.19041.0\win-x64\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2026-04-17T01:07:17.962</Modified>
+      <Modified>2026-04-17T04:59:13.097</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\bin\x64\Debug\net8.0-windows10.0.19041.0\win-x64\acorn.runtimeconfig.json">
       <PackagePath>acorn.runtimeconfig.json</PackagePath>
-      <Modified>2026-04-16T16:31:12.867</Modified>
+      <Modified>2026-04-17T04:59:12.877</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\obj\x64\Debug\net8.0-windows10.0.19041.0\win-x64\apphost.exe">
       <PackagePath>acorn.exe</PackagePath>
-      <Modified>2026-04-16T17:36:28.065</Modified>
+      <Modified>2026-04-17T04:59:12.784</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\obj\x64\Debug\net8.0-windows10.0.19041.0\win-x64\acorn.dll">
       <PackagePath>acorn.dll</PackagePath>
-      <Modified>2026-04-16T17:36:28.058</Modified>
+      <Modified>2026-04-17T04:59:12.778</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\microsoft.netcore.app.runtime.win-x64\8.0.26\runtimes\win-x64\lib\net8.0\Microsoft.CSharp.dll">
       <PackagePath>Microsoft.CSharp.dll</PackagePath>
@@ -900,9 +900,65 @@
       <PackagePath>Microsoft.WinUI.dll</PackagePath>
       <Modified>2026-02-24T09:25:06.000</Modified>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\System.CommandLine.dll">
+      <PackagePath>System.CommandLine.dll</PackagePath>
+      <Modified>2026-03-26T07:31:30.000</Modified>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.numerics.tensors\9.0.0\lib\net8.0\System.Numerics.Tensors.dll">
       <PackagePath>System.Numerics.Tensors.dll</PackagePath>
       <Modified>2024-10-29T02:40:16.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\cs\System.CommandLine.resources.dll">
+      <PackagePath>cs\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:30.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\de\System.CommandLine.resources.dll">
+      <PackagePath>de\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:32.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\es\System.CommandLine.resources.dll">
+      <PackagePath>es\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:34.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\fr\System.CommandLine.resources.dll">
+      <PackagePath>fr\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:36.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\it\System.CommandLine.resources.dll">
+      <PackagePath>it\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:38.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\ja\System.CommandLine.resources.dll">
+      <PackagePath>ja\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:40.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\ko\System.CommandLine.resources.dll">
+      <PackagePath>ko\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:44.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\pl\System.CommandLine.resources.dll">
+      <PackagePath>pl\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:44.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\pt-BR\System.CommandLine.resources.dll">
+      <PackagePath>pt-BR\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:46.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\ru\System.CommandLine.resources.dll">
+      <PackagePath>ru\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:46.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\tr\System.CommandLine.resources.dll">
+      <PackagePath>tr\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:46.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\zh-Hans\System.CommandLine.resources.dll">
+      <PackagePath>zh-Hans\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:48.000</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\zh-Hant\System.CommandLine.resources.dll">
+      <PackagePath>zh-Hant\System.CommandLine.resources.dll</PackagePath>
+      <Modified>2026-03-26T07:31:50.000</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\microsoft.web.webview2\1.0.3179.45\runtimes\win-x64\native\WebView2Loader.dll">
       <PackagePath>WebView2Loader.dll</PackagePath>
@@ -926,47 +982,59 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\bin\x64\Debug\net8.0-windows10.0.19041.0\win-x64\acorn.deps.json">
       <PackagePath>acorn.deps.json</PackagePath>
-      <Modified>2026-04-16T16:31:12.833</Modified>
+      <Modified>2026-04-17T04:59:12.873</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\acorn_icon.ico">
       <PackagePath>Assets\acorn_icon.ico</PackagePath>
-      <Modified>2026-04-14T15:30:25.104</Modified>
+      <Modified>2026-04-17T01:36:33.441</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\acorn_logo.psd">
       <PackagePath>Assets\acorn_logo.psd</PackagePath>
-      <Modified>2026-04-14T15:28:09.283</Modified>
+      <Modified>2026-04-17T01:36:33.459</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\acorn_logo_text.png">
       <PackagePath>Assets\acorn_logo_text.png</PackagePath>
-      <Modified>2026-04-14T15:33:44.600</Modified>
+      <Modified>2026-04-17T01:36:33.487</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\LockScreenLogo.scale-200.png">
       <PackagePath>Assets\LockScreenLogo.scale-200.png</PackagePath>
-      <Modified>2026-04-15T03:01:22.021</Modified>
+      <Modified>2026-04-17T01:36:33.439</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\Nav\backups.png">
+      <PackagePath>Assets\Nav\backups.png</PackagePath>
+      <Modified>2026-04-17T01:39:57.650</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\Nav\restore.png">
+      <PackagePath>Assets\Nav\restore.png</PackagePath>
+      <Modified>2026-04-17T01:39:57.683</Modified>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\Nav\status.png">
+      <PackagePath>Assets\Nav\status.png</PackagePath>
+      <Modified>2026-04-17T01:39:57.670</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\SplashScreen.scale-200.png">
       <PackagePath>Assets\SplashScreen.scale-200.png</PackagePath>
-      <Modified>2026-04-15T03:01:22.021</Modified>
+      <Modified>2026-04-17T01:36:33.439</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\Square150x150Logo.scale-200.png">
       <PackagePath>Assets\Square150x150Logo.scale-200.png</PackagePath>
-      <Modified>2026-04-15T03:01:22.022</Modified>
+      <Modified>2026-04-17T01:36:33.440</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\Square44x44Logo.scale-200.png">
       <PackagePath>Assets\Square44x44Logo.scale-200.png</PackagePath>
-      <Modified>2026-04-15T03:01:22.022</Modified>
+      <Modified>2026-04-17T01:36:33.440</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-24_altform-unplated.png</PackagePath>
-      <Modified>2026-04-15T03:01:22.023</Modified>
+      <Modified>2026-04-17T01:36:33.441</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\StoreLogo.png">
       <PackagePath>Assets\StoreLogo.png</PackagePath>
-      <Modified>2026-04-15T03:01:22.023</Modified>
+      <Modified>2026-04-17T01:36:33.441</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\Wide310x150Logo.scale-200.png">
       <PackagePath>Assets\Wide310x150Logo.scale-200.png</PackagePath>
-      <Modified>2026-04-15T03:01:22.024</Modified>
+      <Modified>2026-04-17T01:36:33.441</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\microsoft.web.webview2\1.0.3179.45\build\..\lib\Microsoft.Web.WebView2.Core.winmd">
       <PackagePath>Microsoft.Web.WebView2.Core.winmd</PackagePath>
@@ -974,7 +1042,7 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\bin\x64\Debug\net8.0-windows10.0.19041.0\win-x64\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2026-04-17T01:07:17.628</Modified>
+      <Modified>2026-04-17T04:59:12.921</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>

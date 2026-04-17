@@ -1,7 +1,6 @@
+using acorn.Pages;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
-using acorn.Pages;
 
 namespace acorn
 {
@@ -10,30 +9,28 @@ namespace acorn
         public MainWindow()
         {
             InitializeComponent();
-            AppWindow.Resize(new Windows.Graphics.SizeInt32(1000, 680));
+            AppWindow.Resize(new Windows.Graphics.SizeInt32(1180, 820));
         }
 
-        private void NavView_Loaded(object sender, RoutedEventArgs e)
+        private void AppNav_Loaded(object sender, RoutedEventArgs e)
         {
-            NavView.SelectedItem = NavView.MenuItems[0];
+            AppNav.SelectedItem = StatusNavItem;
+            NavigateTo("Status");
         }
 
-        private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+        private void AppNav_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (args.SelectedItem is NavigationViewItem item)
-            {
-                NavigateTo(item.Tag as string);
-            }
+            if (args.SelectedItem is NavigationViewItem item && item.Tag is string tag)
+                NavigateTo(tag);
         }
 
-        private void NavigateTo(string? tag)
+        private void NavigateTo(string tag)
         {
             var pageType = tag switch
             {
-                "Backups" => typeof(BackupsPage),
-                "Status"  => typeof(StatusPage),
-                "Restore" => typeof(RestorePage),
-                _         => typeof(BackupsPage)
+                "Status" => typeof(StatusPage),
+                "Settings" => typeof(SettingsPage),
+                _ => typeof(BackupSettingsPage)
             };
 
             if (ContentFrame.CurrentSourcePageType != pageType)

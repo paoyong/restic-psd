@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("acorn")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bf9670256ca96c2b4e3026b2eabb22e51aa0f950")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+03e4e78639d06906fcfc864a17a91f387de8fa11")]
 [assembly: System.Reflection.AssemblyProductAttribute("acorn")]
 [assembly: System.Reflection.AssemblyTitleAttribute("acorn")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

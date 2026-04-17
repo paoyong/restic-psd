@@ -676,8 +676,50 @@
     <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\microsoft.windowsappsdk.winui\1.8.260224000\lib\net6.0-windows10.0.17763.0\Microsoft.WinUI.dll">
       <PackagePath>Microsoft.WinUI.dll</PackagePath>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\System.CommandLine.dll">
+      <PackagePath>System.CommandLine.dll</PackagePath>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.numerics.tensors\9.0.0\lib\net8.0\System.Numerics.Tensors.dll">
       <PackagePath>System.Numerics.Tensors.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\cs\System.CommandLine.resources.dll">
+      <PackagePath>cs\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\de\System.CommandLine.resources.dll">
+      <PackagePath>de\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\es\System.CommandLine.resources.dll">
+      <PackagePath>es\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\fr\System.CommandLine.resources.dll">
+      <PackagePath>fr\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\it\System.CommandLine.resources.dll">
+      <PackagePath>it\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\ja\System.CommandLine.resources.dll">
+      <PackagePath>ja\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\ko\System.CommandLine.resources.dll">
+      <PackagePath>ko\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\pl\System.CommandLine.resources.dll">
+      <PackagePath>pl\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\pt-BR\System.CommandLine.resources.dll">
+      <PackagePath>pt-BR\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\ru\System.CommandLine.resources.dll">
+      <PackagePath>ru\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\tr\System.CommandLine.resources.dll">
+      <PackagePath>tr\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\zh-Hans\System.CommandLine.resources.dll">
+      <PackagePath>zh-Hans\System.CommandLine.resources.dll</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\system.commandline\2.0.6\lib\net8.0\zh-Hant\System.CommandLine.resources.dll">
+      <PackagePath>zh-Hant\System.CommandLine.resources.dll</PackagePath>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\.nuget\packages\microsoft.web.webview2\1.0.3179.45\runtimes\win-x64\native\WebView2Loader.dll">
       <PackagePath>WebView2Loader.dll</PackagePath>
@@ -708,6 +750,15 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\LockScreenLogo.scale-200.png">
       <PackagePath>Assets\LockScreenLogo.scale-200.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\Nav\backups.png">
+      <PackagePath>Assets\Nav\backups.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\Nav\restore.png">
+      <PackagePath>Assets\Nav\restore.png</PackagePath>
+    </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\Nav\status.png">
+      <PackagePath>Assets\Nav\status.png</PackagePath>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\pao\Desktop\acorn\Assets\SplashScreen.scale-200.png">
       <PackagePath>Assets\SplashScreen.scale-200.png</PackagePath>

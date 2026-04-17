@@ -8,37 +8,44 @@
     mc:Ignorable="d"
     Background="Transparent">
 
-    <StackPanel Margin="36,28,36,36" Spacing="20" MaxWidth="800">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="36,28,36,36" Spacing="20" MaxWidth="820">
+            <TextBlock Text="Status" Style="{StaticResource TitleTextBlockStyle}" />
 
-        <TextBlock Text="Status" Style="{StaticResource TitleTextBlockStyle}" />
+            <InfoBar IsOpen="True"
+                     IsClosable="False"
+                     Severity="Informational"
+                     Title="Coming soon"
+                     Message="This status page will show recent backup runs, repository health, and the last activity for each configured schedule." />
 
-        <InfoBar IsOpen="True"
-                 IsClosable="False"
-                 Severity="Informational"
-                 Title="Coming soon"
-                 Message="The Status panel will show live backup activity, last run times, and snapshot counts for each schedule." />
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    Padding="24"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    Opacity="0.6">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Recent activity" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock Text="Placeholder content for backup history, task execution results, and snapshot counts."
+                               Style="{StaticResource BodyTextBlockStyle}"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
 
-        <!-- Placeholder skeleton cards -->
-        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                CornerRadius="8" Padding="24" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                Opacity="0.4">
-            <StackPanel Spacing="12">
-                <TextBlock Text="Every 30 minutes" Style="{StaticResource SubtitleTextBlockStyle}" />
-                <ProgressBar IsIndeterminate="False" Value="0" />
-                <TextBlock Text="Last run: —" Style="{StaticResource CaptionTextBlockStyle}" />
-            </StackPanel>
-        </Border>
-
-        <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                CornerRadius="8" Padding="24" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
-                Opacity="0.4">
-            <StackPanel Spacing="12">
-                <TextBlock Text="Daily" Style="{StaticResource SubtitleTextBlockStyle}" />
-                <ProgressBar IsIndeterminate="False" Value="0" />
-                <TextBlock Text="Last run: —" Style="{StaticResource CaptionTextBlockStyle}" />
-            </StackPanel>
-        </Border>
-
-    </StackPanel>
+            <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    Padding="24"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    Opacity="0.6">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Health checks" Style="{StaticResource SubtitleTextBlockStyle}" />
+                    <TextBlock Text="Placeholder content for repository checks, warnings, and other status signals."
+                               Style="{StaticResource BodyTextBlockStyle}"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </Page>
 
