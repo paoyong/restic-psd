@@ -1,0 +1,71 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\pao\\Desktop\\acorn\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{AA574CD2-7717-6CE2-EEA0-C6A685523848}|acorn.csproj|c:\\users\\pao\\desktop\\acorn\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{AA574CD2-7717-6CE2-EEA0-C6A685523848}|acorn.csproj|solutionrelative:mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AA574CD2-7717-6CE2-EEA0-C6A685523848}|acorn.csproj|c:\\users\\pao\\desktop\\acorn\\config.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{AA574CD2-7717-6CE2-EEA0-C6A685523848}|acorn.csproj|solutionrelative:config.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{AA574CD2-7717-6CE2-EEA0-C6A685523848}|acorn.csproj|c:\\users\\pao\\desktop\\acorn\\services\\taskschedulerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{AA574CD2-7717-6CE2-EEA0-C6A685523848}|acorn.csproj|solutionrelative:services\\taskschedulerservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "MainWindow.xaml",
+              "DocumentMoniker": "C:\\Users\\pao\\Desktop\\acorn\\MainWindow.xaml",
+              "RelativeDocumentMoniker": "MainWindow.xaml",
+              "ToolTip": "C:\\Users\\pao\\Desktop\\acorn\\MainWindow.xaml",
+              "RelativeToolTip": "MainWindow.xaml",
+              "ViewState": "AgIAACsAAAAAAAAAAAAAAC4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
+              "WhenOpened": "2026-04-17T04:25:40.079Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "config.json",
+              "DocumentMoniker": "C:\\Users\\pao\\Desktop\\acorn\\config.json",
+              "RelativeDocumentMoniker": "config.json",
+              "ToolTip": "C:\\Users\\pao\\Desktop\\acorn\\config.json",
+              "RelativeToolTip": "config.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-04-17T02:07:39.729Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TaskSchedulerService.cs",
+              "DocumentMoniker": "C:\\Users\\pao\\Desktop\\acorn\\Services\\TaskSchedulerService.cs",
+              "RelativeDocumentMoniker": "Services\\TaskSchedulerService.cs",
+              "ToolTip": "C:\\Users\\pao\\Desktop\\acorn\\Services\\TaskSchedulerService.cs",
+              "RelativeToolTip": "Services\\TaskSchedulerService.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAQwCwAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-17T01:50:31.972Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "backups": [
+    {
+      "interval_hours": 1,
+      "snapshot_count": 5,
+      "folders_watched": [
+          "C:/Users/$USERNAME$/Desktop"
+      ],
+	  "watched_regex": "*WORKING*",
+      "repo_base_folder": "D:/backups"
+    },
+    {
+      "interval_hours": 24,
+      "snapshot_count": 12,
+      "folders_watched": [
+          "C:/Users/$USERNAME$/Desktop"
+      ],
+	  "watched_regex": "*WORKING*",
+      "repo_base_folder": "D:/backups"
+    },
+  ]
+}
