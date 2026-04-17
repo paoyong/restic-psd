@@ -28,7 +28,8 @@
                               Grid.Column="1"
                               VerticalAlignment="Center"
                               OnContent="Enabled"
-                              OffContent="Disabled" />
+                              OffContent="Disabled"
+                              Toggled="MasterToggle_Toggled" />
             </Grid>
 
             <!-- ── Save feedback ── -->
@@ -123,11 +124,10 @@
                            Opacity="0.6"
                            TextWrapping="Wrap" />
 
-                <!-- Dynamic schedule cards go here -->
+                <!-- Dynamically populated in code-behind -->
                 <StackPanel x:Name="SchedulesPanel" Spacing="8" />
 
-                <Button Content="Add New Backup"
-                        Click="AddNewBackup_Click" />
+                <Button Content="Add New Backup" Click="AddNewBackup_Click" />
             </StackPanel>
 
             <!-- ── Apply / Save ── -->

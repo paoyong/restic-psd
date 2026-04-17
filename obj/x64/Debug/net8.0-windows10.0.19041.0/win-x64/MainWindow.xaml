@@ -25,17 +25,17 @@
         <NavigationView.MenuItems>
             <NavigationViewItem Tag="Backups" Content="Backups">
                 <NavigationViewItem.Icon>
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE753;" />
+                    <FontIcon Style="{StaticResource NavIconStyle}" Glyph="&#xEDA2;" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
             <NavigationViewItem Tag="Status" Content="Status">
                 <NavigationViewItem.Icon>
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE9F9;" />
+                    <FontIcon Style="{StaticResource NavIconStyle}" Glyph="&#xE9F9;" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
             <NavigationViewItem Tag="Restore" Content="Restore">
                 <NavigationViewItem.Icon>
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE777;" />
+                    <FontIcon Style="{StaticResource NavIconStyle}" Glyph="&#xE7A7;" />
                 </NavigationViewItem.Icon>
             </NavigationViewItem>
         </NavigationView.MenuItems>

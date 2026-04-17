@@ -280,3 +280,4 @@ C:\Users\pao\Desktop\acorn\obj\x64\Debug\net8.0-windows10.0.19041.0\win-x64\qual
 C:\Users\pao\Desktop\acorn\obj\x64\Debug\net8.0-windows10.0.19041.0\win-x64\MultipleQualifiersPerDimensionFound.txt
 C:\Users\pao\Desktop\acorn\obj\x64\Debug\net8.0-windows10.0.19041.0\win-x64\ProjectArchitectures.txt
 C:\Users\pao\Desktop\acorn\obj\x64\Debug\net8.0-windows10.0.19041.0\win-x64\.winmd_cache\$Microsoft.Web.WebView2.Core.winmd_638789222360000000.json
+C:\Users\pao\Desktop\acorn\obj\x64\Debug\net8.0-windows10.0.19041.0\win-x64\acorn.sourcelink.json

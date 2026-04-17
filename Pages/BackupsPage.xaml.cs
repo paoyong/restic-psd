@@ -56,6 +56,13 @@ namespace acorn.Pages
                 AddScheduleCard(schedule);
         }
 
+        // ── Master toggle ────────────────────────────────────────────────────
+
+        private void MasterToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            // Persisted on Apply — no immediate action needed.
+        }
+
         // ── Dynamic schedule cards ────────────────────────────────────────────
 
         private void AddNewBackup_Click(object sender, RoutedEventArgs e) =>
